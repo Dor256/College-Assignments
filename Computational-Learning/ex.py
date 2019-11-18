@@ -6,6 +6,10 @@ from math import log, cos, sin, exp, sqrt, e, pi, pow
 
 Q = np.array([[1, 0], [0, 5]])
 IDENTITY_MATRIX = np.array([[1, 0], [0, 1]])
+FIRST_VECTOR = np.array([3, 5])
+FIRST_CONSTANT = 6
+SECOND_VECTOR = np.array([6, 3])
+SECOND_CONSTANT = 2
 
 def sigmoid(x):
     return 1 / (1 + exp(-x))
@@ -15,6 +19,9 @@ def univariate_gaussian(mu, sigma):
 
 def quadratic_function(matrix):
     return lambda w0, w1: (matrix[0][0] * w0 + matrix[0][1] * w0)*w0 + (matrix[1][0] * w1 + matrix[1][1] * w1)*w1
+
+def affine_function(vector, constant):
+    return lambda w0, w1: (vector[0] * w0 + vector[1] * w1) + constant
 
 def plot_univar_func(f: staticmethod, x_min: int, x_max: int):
     x_values = [x for x in range(x_min, x_max)]
@@ -52,9 +59,10 @@ def gradient_descent(f, gradient, w0, learning_rate, obj_tol, param_tol, max_ite
         return w_curr
 
 if __name__ == "__main__":
-    plot_univar_func(lambda x: sigmoid(x), -10, 10)
+    # plot_univar_func(lambda x: sigmoid(x), -10, 10)
     # plot_univar_func(univariate_gaussian(1, 1.5), -10, 10)
     # plot_bivar_func(quadratic_function(Q), -10, 10, -10, 10)
     # plot_bivar_func(quadratic_function(IDENTITY_MATRIX), -10, 10, -10, 10)
-    # plot_bivar_func(lambda x, y: x + y, -100, 100, -100, 100)
+    # plot_bivar_func(affine_function(FIRST_VECTOR, FIRST_CONSTANT), -10, 10, -10, 10)
+    plot_bivar_func(affine_function(SECOND_VECTOR, SECOND_CONSTANT), -10, 10, -10, 10)
     # gradient_descent(lambda x: 2*(x[0]*2)*cos(x[0]) - 5*x[0], lambda x: np.array(2 * (2*x[0]*cos(x[0]) - (x**2 * sin(x[0]))) - 5), np.array([-1]), 0.05, 1e-8, 1e-12, 1000000)
