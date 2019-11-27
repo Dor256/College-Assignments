@@ -1,5 +1,4 @@
 import numpy as np
-from math import log
 from functions import *
 from plots import *
 
