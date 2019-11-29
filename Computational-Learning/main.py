@@ -23,10 +23,7 @@ def gradient_descent(f, gradient, w0, learning_rate, obj_tol, param_tol, max_ite
         print("Objective Value:", f(w_curr))
         print("Step:", np.linalg.norm(np.abs(w_next - w_curr)))
         print("Change in obj value:", np.abs(f(w_next) - f(w_curr)), "\n")
-    if iter_count < max_iter:
-        print("Reached Convergence")
-        return w_curr
-    print("Failed to Converge")
+    print("Reached Convergence") if iter_count < max_iter else print("Failed to Converge") 
     return w_curr
 
 if __name__ == "__main__":
