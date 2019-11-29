@@ -20,7 +20,7 @@ def affine_derivative(vector, constant):
     return lambda w: np.array([vector[0], vector[1]])
 
 def rosenbrok(w):
-    return pow((1 - w[0]), 2) + 100 * pow((w[1] - pow(w[0], 2)), 2)
+    return (1 - w[0]) ** 2 + 100 * (w[1] - w[0] ** 2) ** 2
 
 def rosenbrok_derivative(w):
-    return np.array([(-400 * w[0]) * (w[1] - pow(w[0], 2)) - 2 * (1 - w[0]), (200 * w[0]) * (w[1] - pow(w[0], 2))])
+    return np.array([(-400 * w[0]) * (w[1] - (w[0] ** 2)) - 2 * (1 - w[0]), (200 * w[0]) * (w[1] - (w[0] ** 2))])
