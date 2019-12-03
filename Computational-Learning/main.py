@@ -1,6 +1,7 @@
 import numpy as np
 from functions import *
 from plots import *
+import matplotlib.pyplot as plt
 
 Q = np.array([[1, 0], [0, 5]])
 IDENTITY_MATRIX = np.array([[1, 0], [0, 1]])
@@ -12,11 +13,13 @@ SECOND_CONSTANT = 2
 def gradient_descent(f, gradient, w0, learning_rate, obj_tol, param_tol, max_iter, title: str = ""):
     w_curr = w0
     w_next = w_curr - learning_rate * gradient(w_curr)
+    path = [w_curr, w_next]
     iter_count = 0
     while iter_count < max_iter and np.abs(f(w_next) - f(w_curr)) > obj_tol and np.linalg.norm(np.abs(w_next - w_curr)) > param_tol:
         w_curr = w_next
         w_next = w_curr - learning_rate * gradient(w_curr)
         iter_count += 1
+        path = path[:] + [w_next]
         print(title)
         print("Iteration:", iter_count)
         print("Location is:", w_curr)
@@ -24,7 +27,7 @@ def gradient_descent(f, gradient, w0, learning_rate, obj_tol, param_tol, max_ite
         print("Step:", np.linalg.norm(np.abs(w_next - w_curr)))
         print("Change in obj value:", np.abs(f(w_next) - f(w_curr)), "\n")
     print("Reached Convergence") if iter_count < max_iter else print("Failed to Converge") 
-    return w_curr
+    return path
 
 if __name__ == "__main__":
     # plot_univar_func(lambda x: sigmoid(x), -10, 10, "Sigmoid")
@@ -39,4 +42,4 @@ if __name__ == "__main__":
     # gradient_descent(quadratic_function(IDENTITY_MATRIX), quadratic_derivative(IDENTITY_MATRIX), np.array([1, 1]), 0.1, 1e-8, 1e-12, 100, "Quadratic Function Identity")
     # gradient_descent(affine_function(FIRST_VECTOR, FIRST_CONSTANT), affine_derivative(FIRST_VECTOR, FIRST_CONSTANT), np.array([1, 1]), 0.05, 1e-8, 1e-12, 100, "Affine Function First Vector")
     # gradient_descent(affine_function(SECOND_VECTOR, SECOND_CONSTANT), affine_derivative(SECOND_VECTOR, SECOND_CONSTANT), np.array([1, 1]), 0.05, 1e-8, 1e-12, 100, "Affine Function Second Vector")
-    gradient_descent(rosenbrok, rosenbrok_derivative, np.array([2, 2]), 0.001, 1e-7, 1e-8, 10000, "Rosenbrock Function")
+    points = gradient_descent(rosenbrok, rosenbrok_derivative, np.array([2, 2]), 0.001, 1e-7, 1e-8, 10000, "Rosenbrock Function")
