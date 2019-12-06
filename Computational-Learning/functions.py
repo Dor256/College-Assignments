@@ -17,7 +17,7 @@ def affine_function(vector, constant):
     return lambda w: (vector[0] * w[0] + vector[1] * w[1]) + constant
 
 def affine_derivative(vector, constant):
-    return lambda w: np.array([vector[0], vector[1]])
+    return lambda w: vector
 
 def rosenbrock(w):
     return (1 - w[0]) ** 2 + 100 * (w[1] - w[0] ** 2) ** 2
