@@ -1,8 +1,11 @@
-import { Block } from "./Block";
 import { BlockChain } from "./BlockChain";
+import { Transaction } from "./Transaction";
 
-const snoopCoin = new BlockChain();
-snoopCoin.addBlock(new Block(1, "20/01/2019", { amount: 4 }));
-snoopCoin.addBlock(new Block(2, "20/02/2019", { amount: 8 }));
+const oshCoin = new BlockChain();
+oshCoin.createTransaction(new Transaction("address1", "address2", 100));
+oshCoin.createTransaction(new Transaction("address2", "address1", 50));
 
-console.log(JSON.stringify(snoopCoin, null, 4));
+console.log("Starting miner...")
+oshCoin.minePendingTransactions("Address");
+console.log(`Balance is ${oshCoin.getAddrssBalance("Address")}`);
+console.log(oshCoin.chain);
