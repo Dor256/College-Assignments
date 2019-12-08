@@ -31,8 +31,8 @@ def gradient_descent(f, gradient, w0, learning_rate, obj_tol, param_tol, max_ite
 
 if __name__ == "__main__":
     # plot_univar_func(lambda x: sigmoid(x), -10, 10, "Sigmoid")
-    # plot_univar_func(univariate_gaussian(1, 1.5), -10, 10, "Univariate Gaussian First mu & sigma")
-    # plot_univar_func(univariate_gaussian(2, 2.5), -10, 10, "Univariate Gaussian Second mu & sigma")
+    # plot_univar_func(univariate_gaussian(1, 1.5), -10, 10, "Univariate Gaussian First mu=1 & sigma=1.5")
+    # plot_univar_func(univariate_gaussian(2, 2.5), -10, 10, "Univariate Gaussian Second mu=2 & sigma=2.5")
     # plot_bivar_func(quadratic_function(Q), "Quadratic Q")
     # plot_bivar_func(quadratic_function(IDENTITY_MATRIX), "Quadratic Identity")
     # plot_bivar_func(affine_function(FIRST_VECTOR, FIRST_CONSTANT), "Affine First Vector")
