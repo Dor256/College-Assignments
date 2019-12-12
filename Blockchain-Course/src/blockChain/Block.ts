@@ -16,8 +16,8 @@ export class Block {
         this.timestamp = timestamp;
         this._transactions = transactions;
         this._previousHash = previousHash;
-        this._hash = this.calculateHash();
         this._nonce = 0;
+        this._hash = this.calculateHash();
     }
 
     calculateHash(): string {
@@ -30,6 +30,10 @@ export class Block {
             this.hash = this.calculateHash();
         }
         console.log(`Block Mined: ${this.hash}`);
+    }
+
+    hasValidTransactions(): boolean {
+        return this.transactions.every((transaction) => transaction.isValid());
     }
 
     get previousHash(): string {

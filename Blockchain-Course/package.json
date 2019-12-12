@@ -4,19 +4,22 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node ./dist/main.js",
-    "test": "jest ./dist/**.test.js"
+    "start": "node ./dist/index.js",
+    "test": "jest ./dist/**/**.test.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@types/node": "^12.12.7",
     "crypto-js": "^3.1.9-1",
+    "elliptic": "^6.5.2",
+    "fully-connected-topology": "^1.1.1",
     "tsc": "^1.20150623.0",
     "typescript": "^3.7.2"
   },
   "devDependencies": {
     "@types/crypto-js": "^3.1.43",
+    "@types/elliptic": "^6.4.10",
     "@types/jest": "^24.0.23",
     "@typescript-eslint/eslint-plugin": "^2.7.0",
     "@typescript-eslint/parser": "^2.7.0",

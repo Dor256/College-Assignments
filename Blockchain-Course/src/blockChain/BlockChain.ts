@@ -8,14 +8,14 @@ export class BlockChain {
     private _miningReward: number;
 
     constructor() {
-        this._chain = [this.createGenesisBlock()];
         this._difficulty = 5;
         this._pendingTransactions = [];
         this._miningReward = 100;
+        this._chain = [this.createGenesisBlock()];
     }
 
     private createGenesisBlock(): Block {
-        return new Block("01/01/2019", [new Transaction(null, "Genesis", this.miningReward)], "0");
+        return new Block(Date.parse('01/01/2019').toString(), [], '0');
     }
 
     getLatestBlock(): Block {
@@ -25,14 +25,14 @@ export class BlockChain {
     minePendingTransactions(miningRewardAddress: string) {
         const transactionReward = new Transaction(null, miningRewardAddress, this.miningReward)
         this.pendingTransactions = [...this.pendingTransactions, transactionReward];
-        const block = new Block(new Date().toString(), this.pendingTransactions, this.getLatestBlock().hash);
+        const block = new Block(Date.now().toString(), this.pendingTransactions, this.getLatestBlock().hash);
         block.mineBlock(this.difficulty);
         console.log("Block successfuly mined!");
         this.chain = [...this.chain, block];
         this.pendingTransactions = [];
     }
 
-    getAddrssBalance(address: string): number {
+    getAddressBalance(address: string): number {
         return this.chain.map((block) => block.transactions.map((transaction) => transaction)
             .reduce((prev, curr) => {
                 if(curr.fromAddress === address) {
@@ -42,17 +42,29 @@ export class BlockChain {
                     prev += curr.amount;
                 }
                 return prev;
-            }, 0))[0];
+            }, 0))[this.chain.length - 1];
     }
 
-    createTransaction(transaction: Transaction) {
+    addTransaction(transaction: Transaction) {
+        if(!transaction.fromAddress) {
+            throw new Error("Transactions must include a from address!");
+        }
+        if(!transaction.isValid()) {
+            throw new Error("Can't add an invalid transaction to the chain!");
+        }
         this.pendingTransactions = [...this.pendingTransactions, transaction];
     }
 
     isValidChain(): boolean {
+        if(JSON.stringify(this.createGenesisBlock()) !== JSON.stringify(this.chain[0])){
+            return false;
+        }
         return this.chain.every((block, i) => {
             if(!this.chain[i+1]) {
                 return true;
+            }
+            if(!this.chain[i+1].hasValidTransactions()) {
+                return false;
             }
             return block.hash === block.calculateHash() && block.hash === this.chain[i+1].previousHash;
         });
