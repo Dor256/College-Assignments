@@ -33,16 +33,10 @@ export class BlockChain {
     }
 
     getAddressBalance(address: string): number {
-        return this.chain.map((block) => block.transactions.map((transaction) => transaction)
-            .reduce((prev, curr) => {
-                if(curr.fromAddress === address) {
-                    prev -= curr.amount;
-                }
-                if(curr.toAddress === address) {
-                    prev += curr.amount;
-                }
-                return prev;
-            }, 0))[this.chain.length - 1];
+        const transactions = this.chain.reduce((transactions, singleBlock) => [...transactions, ...singleBlock.transactions], [] as Transaction[]);
+        const incomingAmount = transactions.reduce((incoming, transaction) => incoming + (transaction.toAddress === address ? transaction.amount : 0), 0);
+        const outgoingAmount = transactions.reduce((outgoing, transaction) => outgoing - (transaction.fromAddress === address ? transaction.amount : 0), 0);
+        return incomingAmount + outgoingAmount;
     }
 
     addTransaction(transaction: Transaction) {

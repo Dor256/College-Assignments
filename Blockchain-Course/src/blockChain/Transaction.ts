@@ -7,14 +7,14 @@ export class Transaction {
     private _fromAddress: string | null;
     private _toAddress: string;
     private _amount: number;
-    private timestamp: string;
-    private signature?: string;
+    private _timestamp: string;
+    private _signature?: string;
 
-    constructor(fromAddress: string | null, toAddress: string, amount: number) {
+    constructor(fromAddress: string | null, toAddress: string, amount: number, timestamp: string = Date.now().toString()) {
         this._fromAddress = fromAddress;
         this._toAddress = toAddress;
         this._amount = amount;
-        this.timestamp = Date.now().toString();
+        this._timestamp = timestamp;
     }
 
     calculateHash(): string {
@@ -50,5 +50,17 @@ export class Transaction {
 
     get amount(): number {
         return this._amount;
+    }
+
+    get timestamp(): string {
+        return this._timestamp;
+    }
+
+    get signature(): string | undefined {
+        return this._signature;
+    }
+
+    set signature(signature: string | undefined) {
+        this._signature = signature;
     }
 }

@@ -14,6 +14,7 @@
     "crypto-js": "^3.1.9-1",
     "elliptic": "^6.5.2",
     "fully-connected-topology": "^1.1.1",
+    "merkletreejs": "^0.1.7",
     "tsc": "^1.20150623.0",
     "typescript": "^3.7.2"
   },
