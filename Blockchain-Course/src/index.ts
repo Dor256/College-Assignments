@@ -22,23 +22,21 @@ const kaiCoin = new BlockChain();
 
 type RawTransaction = {fromAddress: string, toAddress: string, amount: number, signature: string, timestamp: string};
 
-minerNode.on('connection', (connection: any, peer: string) => {
+minerNode.on('connection', (connection, peer) => {
   connection.setEncoding('utf8');
   connection.on('data', (data: string) => {
     const dataObj: RawTransaction = JSON.parse(data);
     const transaction = new Transaction(dataObj.fromAddress, dataObj.toAddress, dataObj.amount, dataObj.timestamp);
     transaction.signature = dataObj.signature;
-    if (transaction.isValid()) {
-      kaiCoin.addTransaction(transaction);
-      console.log("Mining...");
-      kaiCoin.minePendingTransactions(minerWallet);
-      console.log(`Miner's Balance: ${kaiCoin.getAddressBalance(minerWallet)}`);
-    }
+    kaiCoin.addTransaction(transaction);
+    console.log("Mining...");
+    kaiCoin.minePendingTransactions(minerWallet);
+    console.log(`Miner's Balance: ${kaiCoin.getAddressBalance(minerWallet)}`);
   });
   console.log('t1 is connected to', peer);
 });
 
-dor.on('connection', (connection: any, peer: string) => {
+dor.on('connection', (connection, peer) => {
   connection.setEncoding('utf8');
   console.log('t2 is connected to', peer);
   const transaction = new Transaction(dorWallet, shaharWallet, 50);
@@ -46,7 +44,7 @@ dor.on('connection', (connection: any, peer: string) => {
   connection.write(JSON.stringify({ fromAddress: dorWallet, toAddress: shaharWallet, amount: 50, signature: transaction.signature, timestamp: transaction.timestamp }));
 });
 
-shahar.on('connection', (connection: any, peer: string) => {
+shahar.on('connection', (connection, peer) => {
   connection.setEncoding('utf8');
   console.log('t3 is connected to', peer);
   const transaction = new Transaction(shaharWallet, dorWallet, 100);

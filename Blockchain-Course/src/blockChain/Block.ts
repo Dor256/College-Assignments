@@ -1,5 +1,5 @@
 import SHA256 from "crypto-js/sha256";
-import MerkleTree from "merkletreejs";
+// import MerkleTree from "merkletreejs";
 import { Transaction } from "./Transaction";
 
 export type Data = {
@@ -12,7 +12,7 @@ export class Block {
     private _previousHash: string;
     private _hash: string;
     private _nonce: number;
-    private merkletree: typeof MerkleTree;
+    // private merkletree: any;
 
     constructor(timestamp: string, transactions: Transaction[], previousHash: string = '') {
         this.timestamp = timestamp;
@@ -20,7 +20,7 @@ export class Block {
         this._previousHash = previousHash;
         this._nonce = 0;
         this._hash = this.calculateHash();
-        this.merkletree = new MerkleTree(transactions, SHA256);
+        // this.merkletree = new MerkleTree(transactions, SHA256);
     }
 
     calculateHash(): string {

@@ -8,7 +8,7 @@ export class BlockChain {
     private _miningReward: number;
 
     constructor() {
-        this._difficulty = 5;
+        this._difficulty = 3;
         this._pendingTransactions = [];
         this._miningReward = 100;
         this._chain = [this.createGenesisBlock()];
@@ -33,7 +33,7 @@ export class BlockChain {
     }
 
     getAddressBalance(address: string): number {
-        const transactions = this.chain.reduce((transactions, singleBlock) => [...transactions, ...singleBlock.transactions], [] as Transaction[]);
+        const transactions = this.chain.flatMap((block) => block.transactions);
         const incomingAmount = transactions.reduce((incoming, transaction) => incoming + (transaction.toAddress === address ? transaction.amount : 0), 0);
         const outgoingAmount = transactions.reduce((outgoing, transaction) => outgoing - (transaction.fromAddress === address ? transaction.amount : 0), 0);
         return incomingAmount + outgoingAmount;
