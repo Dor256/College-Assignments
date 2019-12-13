@@ -2,14 +2,14 @@ import { BlockChain } from "./BlockChain";
 import { Block } from "./Block";
 import { Transaction } from "./Transaction";
 import { ec } from "elliptic";
-import { privateKey } from "../wallet";
+import { dorPrivateKey } from "../wallets";
 jest.mock("./Block");
 jest.mock("./Transaction");
 
 describe('Valid BlockChain', () => {
     it('Adds a block', () => {
         const elliptic = new ec('secp256k1');
-        const key = elliptic.keyFromPrivate(privateKey);
+        const key = elliptic.keyFromPrivate(dorPrivateKey);
         const walletAddress = key.getPublic(true, 'hex');
         const blockChain = new BlockChain();
         const transaction = new Transaction(walletAddress, "address2", 100);
@@ -21,7 +21,7 @@ describe('Valid BlockChain', () => {
 
     it('Creates a consistent hash', () => {
         const elliptic = new ec('secp256k1');
-        const key = elliptic.keyFromPrivate(privateKey);
+        const key = elliptic.keyFromPrivate(dorPrivateKey);
         const walletAddress = key.getPublic(true, 'hex');
         const blockChain = new BlockChain();
         const transaction = new Transaction(walletAddress, "address2", 100);
@@ -33,7 +33,7 @@ describe('Valid BlockChain', () => {
 
     it('Matches the previous hash', () => {
         const elliptic = new ec('secp256k1');
-        const key = elliptic.keyFromPrivate(privateKey);
+        const key = elliptic.keyFromPrivate(dorPrivateKey);
         const walletAddress = key.getPublic(true, 'hex');
         const blockChain = new BlockChain();
         const transaction = new Transaction(walletAddress, "address2", 100);
@@ -46,7 +46,7 @@ describe('Valid BlockChain', () => {
 
     it("Generates an invalid chain", () => {
         const elliptic = new ec('secp256k1');
-        const key = elliptic.keyFromPrivate(privateKey);
+        const key = elliptic.keyFromPrivate(dorPrivateKey);
         const walletAddress = key.getPublic(true, 'hex');
         const generateHash = jest.fn();
         Block.prototype.calculateHash = generateHash;

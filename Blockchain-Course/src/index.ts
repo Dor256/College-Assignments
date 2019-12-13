@@ -1,10 +1,10 @@
 import { BlockChain } from "./blockChain/BlockChain";
 import { Transaction } from "./blockChain/Transaction";
 import { ec } from "elliptic";
-import { privateKey } from "./wallet";
+import { dorPrivateKey } from "./wallets";
 
 const elliptic = new ec('secp256k1');
-const key = elliptic.keyFromPrivate(privateKey);
+const key = elliptic.keyFromPrivate(dorPrivateKey);
 const walletAddress = key.getPublic(true, 'hex');
 
 const oshCoin = new BlockChain();
