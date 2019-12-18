@@ -56,5 +56,5 @@ describe('Valid BlockChain', () => {
         transaction.signTransaction(key);
         blockChain.addTransaction(transaction);
         expect(blockChain.isValidChain()).toBe(false);
-    })
+    });
 });

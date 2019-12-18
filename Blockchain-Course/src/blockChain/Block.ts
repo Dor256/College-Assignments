@@ -3,7 +3,7 @@ import SHA256 from "crypto-js/sha256";
 import { Transaction } from "./Transaction";
 
 export type Data = {
-    amount: number;
+    amount: number
 }
 
 export class Block {
@@ -14,7 +14,7 @@ export class Block {
     private _nonce: number;
     // private merkletree: any;
 
-    constructor(timestamp: string, transactions: Transaction[], previousHash: string = '') {
+    constructor(timestamp: string, transactions: Transaction[], previousHash = '') {
         this.timestamp = timestamp;
         this._transactions = transactions;
         this._previousHash = previousHash;
@@ -27,7 +27,7 @@ export class Block {
         return SHA256(this.previousHash + this.timestamp + JSON.stringify(this.transactions) + this.nonce).toString();
     }
     
-    mineBlock(difficulty: number) {
+    mineBlock(difficulty: number): void {
         while(this.hash.substring(0, difficulty) !== Array(difficulty + 1).join("0")) {
             this.nonce++;
             this.hash = this.calculateHash();

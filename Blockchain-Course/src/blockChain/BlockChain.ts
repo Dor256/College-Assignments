@@ -22,8 +22,8 @@ export class BlockChain {
         return this.chain[this.chain.length - 1];
     }
 
-    minePendingTransactions(miningRewardAddress: string) {
-        const transactionReward = new Transaction(null, miningRewardAddress, this.miningReward)
+    minePendingTransactions(miningRewardAddress: string): void {
+        const transactionReward = new Transaction(null, miningRewardAddress, this.miningReward);
         this.pendingTransactions = [...this.pendingTransactions, transactionReward];
         const block = new Block(Date.now().toString(), this.pendingTransactions, this.getLatestBlock().hash);
         block.mineBlock(this.difficulty);
@@ -39,7 +39,7 @@ export class BlockChain {
         return incomingAmount + outgoingAmount;
     }
 
-    addTransaction(transaction: Transaction) {
+    addTransaction(transaction: Transaction): void {
         if(!transaction.fromAddress) {
             throw new Error("Transactions must include a from address!");
         }

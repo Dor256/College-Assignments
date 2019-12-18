@@ -5,7 +5,8 @@
     },
     "extends": [
         "eslint:recommended",
-        "plugin:@typescript-eslint/eslint-recommended"
+        "plugin:@typescript-eslint/eslint-recommended",
+        "plugin:@typescript-eslint/recommended"
     ],
     "globals": {
         "Atomics": "readonly",
@@ -20,5 +21,17 @@
         "@typescript-eslint"
     ],
     "rules": {
+        "semi-style": "warn",
+        "semi": "warn",
+        "@typescript-eslint/member-delimiter-style": ["warn", {
+            "multiline": {
+                "delimiter": "comma",
+                "requireLast": false
+            },
+            "singleline": {
+                "delimiter": "comma",
+                "requireLast": false
+            }
+        }]
     }
 }
