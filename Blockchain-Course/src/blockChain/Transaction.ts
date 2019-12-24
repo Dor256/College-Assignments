@@ -21,7 +21,7 @@ export class Transaction {
         return SHA256(this.fromAddress + this.toAddress + this.amount + this.timestamp).toString();
     }
 
-    signTransaction(signingKey: ec.KeyPair) {
+    signTransaction(signingKey: ec.KeyPair): void {
         if(signingKey.getPublic(true, 'hex') !== this.fromAddress) {
             throw new Error("You can't sign transactions for other wallets!");
         }
