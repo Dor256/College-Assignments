@@ -23,6 +23,7 @@
     "rules": {
         "semi-style": "warn",
         "semi": "warn",
+        "@typescript-eslint/no-explicit-any": "off",
         "@typescript-eslint/member-delimiter-style": ["warn", {
             "multiline": {
                 "delimiter": "comma",
