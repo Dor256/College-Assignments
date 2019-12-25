@@ -10,6 +10,7 @@ FIRST_CONSTANT = 6
 SECOND_VECTOR = np.array([6, 3])
 SECOND_CONSTANT = 2
 
+
 def gradient_descent(f, gradient, w0, learning_rate, obj_tol, param_tol, max_iter, title: str = ""):
     w_curr = w0
     w_next = w_curr - learning_rate * gradient(w_curr)
@@ -29,6 +30,7 @@ def gradient_descent(f, gradient, w0, learning_rate, obj_tol, param_tol, max_ite
     print("Reached Convergence") if iter_count < max_iter else print("Failed to Converge") 
     return path
 
+
 if __name__ == "__main__":
     # plot_univar_func(lambda x: sigmoid(x), -10, 10, "Sigmoid")
     # plot_univar_func(univariate_gaussian(1, 1.5), -10, 10, "Univariate Gaussian First mu=1 & sigma=1.5")
@@ -42,9 +44,11 @@ if __name__ == "__main__":
     # points = gradient_descent(quadratic_function(IDENTITY_MATRIX), quadratic_derivative(IDENTITY_MATRIX), np.array([1, 1]), 0.1, 1e-8, 1e-12, 100, "Quadratic Function Identity")
     # points = gradient_descent(affine_function(FIRST_VECTOR, FIRST_CONSTANT), affine_derivative(FIRST_VECTOR, FIRST_CONSTANT), np.array([1, 1]), 0.05, 1e-8, 1e-12, 100, "Affine Function First Vector")
     # points = gradient_descent(affine_function(SECOND_VECTOR, SECOND_CONSTANT), affine_derivative(SECOND_VECTOR, SECOND_CONSTANT), np.array([1, 1]), 0.05, 1e-8, 1e-12, 100, "Affine Function Second Vector")
-    points = gradient_descent(rosenbrock, rosenbrock_derivative, np.array([2, 2]), 0.001, 1e-7, 1e-8, 10000, "Rosenbrock Function")
+    # points = gradient_descent(rosenbrock, rosenbrock_derivative, np.array([2, 2]), 0.001, 1e-7, 1e-8, 10000, "Rosenbrock Function")
     # plot_gradient_descent_path(quadratic_function(Q), points, "Quadratic Function Q")
     # plot_gradient_descent_path(quadratic_function(IDENTITY_MATRIX), points, "Quadratic Function Identity")
     # plot_gradient_descent_path(affine_function(FIRST_VECTOR, FIRST_CONSTANT), points, "Affine Function First Vector")
     # plot_gradient_descent_path(affine_function(SECOND_VECTOR, SECOND_CONSTANT), points, "Affine Function First Vector")
-    plot_gradient_descent_path(rosenbrock, points, "Rosenbrock")
+    # plot_gradient_descent_path(rosenbrock, points, "Rosenbrock")
+    print(linear_regression(np.array([1, 1]), np.array([5, 6]), np.array([3, 4])))
+    print(logistic_regression(np.array([1, 1]), np.array([5, 6]), np.array([3, 4])))
