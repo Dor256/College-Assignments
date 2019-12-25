@@ -19,21 +19,25 @@ const minerNode = topology('127.0.0.1:4001', ['127.0.0.1:4002', '127.0.0.1:4003'
 const dor = topology('127.0.0.1:4002', ['127.0.0.1:4001', '127.0.0.1:4003']);
 const shahar = topology('127.0.0.1:4003', ['127.0.0.1:4001', '127.0.0.1:4002']);
 
-const kaiCoin = new BlockChain();
 
 type RawTransaction = {fromAddress: string, toAddress: string, amount: number, signature: string, timestamp: string};
 
+const kaiCoin = new BlockChain();
 minerNode.on('connection', (connection, peer) => {
   connection.setEncoding('utf8');
   connection.on('data', (data: string) => {
     const dataObj: RawTransaction[] = JSON.parse(data);
     dataObj.forEach((pending) => {
+      console.log(pending);
       const transaction = new Transaction(pending.fromAddress, pending.toAddress, pending.amount, pending.timestamp);
       transaction.signature = pending.signature;
       kaiCoin.addTransaction(transaction);
-      console.log("Mining...");
-      kaiCoin.minePendingTransactions(minerWallet);
-      console.log(`Miner's Balance: ${kaiCoin.getAddressBalance(minerWallet)}`);
+      console.log(kaiCoin.pendingTransactions.length);
+      if (kaiCoin.pendingTransactions.length === 4) {
+        console.log("Mining...");
+        kaiCoin.minePendingTransactions(minerWallet);
+        console.log(`Miner's Balance: ${kaiCoin.getAddressBalance(minerWallet)}`);
+      }
     });
   });
   console.log('t1 is connected to', peer);

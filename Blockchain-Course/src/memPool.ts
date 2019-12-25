@@ -30,5 +30,15 @@ export const memPool = [
         from: dorPublicKey,
         to: shaharPublicKey,
         amount: 50
+    },
+    {
+        from: dorPublicKey,
+        to: shaharPublicKey,
+        amount: 50
+    },
+    {
+        from: dorPublicKey,
+        to: shaharPublicKey,
+        amount: 50
     }
 ];

@@ -1,5 +1,6 @@
 import SHA256 from "crypto-js/sha256";
 import MerkleTree from "merkletreejs/dist/index";
+import BloomFilter from 'bloomfilter';
 import { Transaction } from "./Transaction";
 
 export type Data = {
@@ -13,6 +14,7 @@ export class Block {
     private _hash: string;
     private _nonce: number;
     private merkletree: any;
+    private _bloomfilter = this.createBloomFilter()
 
     constructor(timestamp: string, transactions: Transaction[], previousHash = '') {
         this.timestamp = timestamp;
@@ -21,6 +23,17 @@ export class Block {
         this._nonce = 0;
         this._hash = this.calculateHash();
         this.merkletree = new MerkleTree(transactions.map((leaf) => leaf.calculateHash()), SHA256);
+    }
+
+    createBloomFilter() {
+        var bloom = new BloomFilter(4 * 256, 1);
+    var shaTrans = this.merkleTree.leaves;
+    if (shaTrans.length !== 0) {
+      for (var i = 0; i < shaTrans.length; i++) {
+        bloom.add(shaTrans[i]);
+      }
+    }
+    return bloom;
     }
 
     calculateHash(): string {
