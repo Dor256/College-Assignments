@@ -1,5 +1,7 @@
 import numpy as np
 from math import exp, sqrt, e, pi, pow
+import sklearn.datasets as skd
+import pandas as pd
 
 def sigmoid(x):
     return 1 / (1 + np.exp(-x))
@@ -35,14 +37,12 @@ def rosenbrock_derivative(w):
 
 def linear_regression(w, x, y):
     n = len(y)
-    loss = sum((((w * x) - y) ** 2)) / (2 * n)
+    loss = sum(((w * x).sum(axis=1) - y) ** 2) / (2 * n)
     return loss, linear_regression_derivative(w, x, y)
 
 
 def linear_regression_derivative(w, x, y):
-    n = len(y)
-    gradient = ((w * x) - y) * x / n
-    return gradient
+    return ((w * x).sum(axis=1) - y).values.dot(x.values) / len(y)
 
 
 def logistic_regression(w, x, y):
@@ -54,29 +54,4 @@ def logistic_regression(w, x, y):
 def logistic_regression_derivative(w, x, y):
     return sigmoid(w * x) * x
 
-
-def train_test_split(x, y, ratio):
-    n = len(x)
-    test_count = int(n * ratio)
-    return x[:test_count], y[:test_count], x[test_count:], y[test_count:]
-
-
-def k_fold_split(x, y, k, split_num):
-    parts_count = int(len(x) / k)
-
-    validation_from = (split_num - 1) * parts_count
-    validation_to = split_num * parts_count
-
-    first_train_from = 0
-    first_train_to = validation_from
-
-    second_train_from = validation_to
-    second_train_to = len(x)
-
-    cur_fold_x_train = np.append(x[first_train_from:first_train_to], x[second_train_from:second_train_to])
-    cur_fold_y_train = np.append(y[first_train_from:first_train_to], y[second_train_from:second_train_to])
-    cur_fold_x_validation = x[validation_from:validation_to]
-    cur_fold_y_validation = y[validation_from:validation_to]
-
-    return cur_fold_x_train, cur_fold_y_train, cur_fold_x_validation, cur_fold_y_validation
 
