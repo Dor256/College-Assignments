@@ -1,5 +1,6 @@
 import numpy as np
 from math import exp, sqrt, e, pi, pow
+import pandas as pd
 
 def sigmoid(x):
     return 1 / (1 + np.exp(-x))
@@ -31,25 +32,3 @@ def rosenbrock(w):
 
 def rosenbrock_derivative(w):
     return np.array([(-400 * w[0]) * (w[1] - (w[0] ** 2)) - 2 * (1 - w[0]), (200 * w[0]) * (w[1] - (w[0] ** 2))])
-
-
-def linear_regression(w, x, y):
-    n = len(y)
-    loss = sum((((w * x) - y) ** 2)) / (2 * n)
-    return loss, linear_regression_derivative(w, x, y)
-
-
-def linear_regression_derivative(w, x, y):
-    n = len(y)
-    gradient = ((w * x) - y) * x / n
-    return gradient
-
-
-def logistic_regression(w, x, y):
-    n = len(y)
-    loss = sum(y * np.log(sigmoid(w * x)) + (1 - y) * np.log(1 - sigmoid(w * x))) / (-n)
-    return loss, logistic_regression_derivative(w, x, y)
-
-
-def logistic_regression_derivative(w, x, y):
-    return sigmoid(w * x) * x

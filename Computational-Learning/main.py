@@ -2,6 +2,10 @@ import numpy as np
 from functions import *
 from plots import *
 import matplotlib.pyplot as plt
+from sklearn import datasets
+import pandas as pd
+from Models import LinearRegression, LogisticRegression
+from Loss import linear_regression, linear_regression_derivative
 
 Q = np.array([[1, 0], [0, 5]])
 IDENTITY_MATRIX = np.array([[1, 0], [0, 1]])
@@ -11,24 +15,59 @@ SECOND_VECTOR = np.array([6, 3])
 SECOND_CONSTANT = 2
 
 
-def gradient_descent(f, gradient, w0, learning_rate, obj_tol, param_tol, max_iter, title: str = ""):
-    w_curr = w0
-    w_next = w_curr - learning_rate * gradient(w_curr)
-    path = [w_curr, w_next]
-    iter_count = 0
-    while iter_count < max_iter and np.abs(f(w_next) - f(w_curr)) > obj_tol and np.linalg.norm(np.abs(w_next - w_curr)) > param_tol:
-        w_curr = w_next
-        w_next = w_curr - learning_rate * gradient(w_curr)
-        iter_count += 1
-        path = path[:] + [w_next]
-        print(title)
-        print("Iteration:", iter_count)
-        print("Location is:", w_curr)
-        print("Objective Value:", f(w_curr))
-        print("Step:", np.linalg.norm(np.abs(w_next - w_curr)))
-        print("Change in obj value:", np.abs(f(w_next) - f(w_curr)), "\n")
-    print("Reached Convergence") if iter_count < max_iter else print("Failed to Converge") 
-    return path
+def prepare_boston_data():
+    boston_data = datasets.load_boston()
+    boston = pd.DataFrame(boston_data.data, columns=boston_data.feature_names)
+    boston['TARGET'] = boston_data.target
+    boston['ONES'] = 1
+    shuffled_boston = boston[['ONES', 'RM', 'LSTAT', 'TARGET']].sample(frac=1)
+    return train_test_split(shuffled_boston[['ONES', 'RM', 'LSTAT']], shuffled_boston['TARGET'], 0.8)
+
+
+def prepare_iris_data():
+    iris_data = datasets.load_iris()
+    iris = pd.DataFrame(iris_data.data, columns=iris_data.feature_names)
+    iris['TARGET'] = iris_data.target
+    iris = iris[iris.TARGET != 2]
+    shuffled_iris = iris.sample(frac=1)
+    return train_test_split(shuffled_iris[['sepal length (cm)', 'sepal width (cm)', 'petal length (cm)', 'petal width (cm)']], shuffled_iris['TARGET'], 0.8)
+
+
+def evaluate_model(model, validationX, validationY):
+    validation_check = model.predict(validationX)
+    validation_diff = pd.DataFrame({ 'Difference': np.abs(validationY.values - validation_check['Prediction'].values) }, index=validationY.index)
+    print('PREDICTIONS')
+    print(validation_check)
+    print('GROUND TRUTH')
+    print(validationY)
+    print('DIFF')
+    print(validation_diff)
+
+
+def train_test_split(x, y, ratio):
+    n = len(x)
+    test_count = int(n * ratio)
+    return x[:test_count], y[:test_count], x[test_count:], y[test_count:]
+
+
+def k_fold_split(x, y, k, split_num):
+    parts_count = int(len(x) / k)
+
+    validation_from = (split_num - 1) * parts_count
+    validation_to = split_num * parts_count
+
+    first_train_from = 0
+    first_train_to = validation_from
+
+    second_train_from = validation_to
+    second_train_to = len(x)
+
+    cur_fold_x_train = np.append(x[first_train_from:first_train_to], x[second_train_from:second_train_to])
+    cur_fold_y_train = np.append(y[first_train_from:first_train_to], y[second_train_from:second_train_to])
+    cur_fold_x_validation = x[validation_from:validation_to]
+    cur_fold_y_validation = y[validation_from:validation_to]
+
+    return cur_fold_x_train, cur_fold_y_train, cur_fold_x_validation, cur_fold_y_validation
 
 
 if __name__ == "__main__":
@@ -50,5 +89,12 @@ if __name__ == "__main__":
     # plot_gradient_descent_path(affine_function(FIRST_VECTOR, FIRST_CONSTANT), points, "Affine Function First Vector")
     # plot_gradient_descent_path(affine_function(SECOND_VECTOR, SECOND_CONSTANT), points, "Affine Function First Vector")
     # plot_gradient_descent_path(rosenbrock, points, "Rosenbrock")
-    print(linear_regression(np.array([1, 1]), np.array([5, 6]), np.array([3, 4])))
-    print(logistic_regression(np.array([1, 1]), np.array([5, 6]), np.array([3, 4])))
+    # trainX, trainY, validationX, validationY = prepare_boston_data()
+    # model = LinearRegression(trainX, trainY, np.array([0, 0, 0]), 0.001, 1e-5, 1e-12, 'Boston Housing Prices')
+    # model.train()
+    # evaluate_model(model, validationX, validationY)
+    trainX, trainY, validationX, validationY = prepare_iris_data()
+    model = LogisticRegression(trainX, trainY, np.array([0, 0, 0, 0]), 0.05, 1e-5, 1e-12, 'Iris Data')
+    model.train()
+    evaluate_model(model, validationX, validationY)
+    
