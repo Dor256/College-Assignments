@@ -27,4 +27,4 @@ class LinearRegression(Model):
             )
 
     def predict(self, sample):
-        return pd.DataFrame({ 'Prediction': np.dot(sample, self.weights) })
+        return pd.DataFrame({ 'Prediction': np.dot(sample, self.weights) }, index=sample.index)

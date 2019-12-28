@@ -20,3 +20,4 @@ class Model(ABC):
         print(validationY)
         print('DIFF')
         print(validation_diff)
+        return validation_check
