@@ -1,9 +1,10 @@
 import numpy as np
 import pandas as pd
+from Models import Model
 from GradientDescent import gradient_descent
 from Loss import linear_regression, linear_regression_derivative
 
-class LinearRegression:
+class LinearRegression(Model):
     def __init__(self, trainX, trainY, weights, lr, obj_tol, param_tol, model_name: str = 'Linear Regression'):
         self.trainX = trainX
         self.trainY = trainY

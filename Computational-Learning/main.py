@@ -33,17 +33,6 @@ def prepare_iris_data():
     return train_test_split(shuffled_iris[['sepal length (cm)', 'sepal width (cm)', 'petal length (cm)', 'petal width (cm)']], shuffled_iris['TARGET'], 0.8)
 
 
-def evaluate_model(model, validationX, validationY):
-    validation_check = model.predict(validationX)
-    validation_diff = pd.DataFrame({ 'Difference': np.abs(validationY.values - validation_check['Prediction'].values) }, index=validationY.index)
-    print('PREDICTIONS')
-    print(validation_check)
-    print('GROUND TRUTH')
-    print(validationY)
-    print('DIFF')
-    print(validation_diff)
-
-
 def train_test_split(x, y, ratio):
     n = len(x)
     test_count = int(n * ratio)
@@ -96,5 +85,5 @@ if __name__ == "__main__":
     trainX, trainY, validationX, validationY = prepare_iris_data()
     model = LogisticRegression(trainX, trainY, np.array([0, 0, 0, 0]), 0.05, 1e-5, 1e-12, 'Iris Data')
     model.train()
-    evaluate_model(model, validationX, validationY)
+    model.evaluate_model(validationX, validationY)
     

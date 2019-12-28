@@ -1,10 +1,11 @@
 import numpy as np
 import pandas as pd
 from functions import sigmoid
+from Models import Model
 from GradientDescent import gradient_descent
 from Loss import logistic_regression, logistic_regression_derivative
 
-class LogisticRegression:
+class LogisticRegression(Model):
     def __init__(self, trainX, trainY, weights, lr, obj_tol, param_tol, model_name: str = 'Logistic Regression'):
         self.trainX = trainX
         self.trainY = trainY
