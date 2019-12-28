@@ -52,13 +52,78 @@ def k_fold_split(x, y, k, split_num):
     second_train_from = validation_to
     second_train_to = len(x)
 
-    cur_fold_x_train = np.append(x[first_train_from:first_train_to], x[second_train_from:second_train_to])
-    cur_fold_y_train = np.append(y[first_train_from:first_train_to], y[second_train_from:second_train_to])
+    cur_fold_x_train = pd.concat([x[first_train_from:first_train_to], x[second_train_from:second_train_to]])
+    cur_fold_y_train = pd.concat([y[first_train_from:first_train_to], y[second_train_from:second_train_to]])
     cur_fold_x_validation = x[validation_from:validation_to]
     cur_fold_y_validation = y[validation_from:validation_to]
 
     return cur_fold_x_train, cur_fold_y_train, cur_fold_x_validation, cur_fold_y_validation
 
+
+def boston_housing_prices_full(trainX, trainY):
+    print("======================Regression - Full Training Set=========================\n")
+    model = LinearRegression(trainX, trainY, np.array([0, 0, 0]), 0.001, 1e-5, 1e-12, 'Boston Housing Prices')
+    model.train()
+    prediction = model.predict(validationX)
+    mean_sqr_err = (np.linalg.norm(validationY.values - prediction.values) ** 2) / len(validationY)
+    mean_abs_percentage_err = np.mean(np.abs((validationY.values - prediction.values) / validationY.values)) * 100
+    print("Mean Square Error: ", mean_sqr_err)
+    print("Mean Absolute Percentage Error: ", mean_abs_percentage_err)
+
+
+def boston_housing_prices_k_fold(trainX, trainY):
+    print("======================Regression - K-Fold Iterations (K=5)=========================\n")
+    k = 5
+    for i in range(k):
+        print("=============Iteration Number " + str(i + 1) + "================")
+        k_trainX, k_trainY, k_validationX, k_validationY = k_fold_split(trainX, trainY, k, i + 1)
+        model = LinearRegression(k_trainX, k_trainY, np.array([0, 0, 0]), 0.001, 1e-5, 1e-12, 'Boston Housing Prices')
+        model.train()
+        prediction = model.predict(k_validationX)
+        mean_sqr_err = (np.linalg.norm(k_validationY.values - prediction.values) ** 2) / len(k_validationY)
+        mean_abs_percentage_err = np.mean(np.abs((k_validationY.values - prediction.values) / k_validationY.values)) * 100
+        print("Mean Square Error: ", mean_sqr_err)
+        print("Mean Absolute Percentage Error: ", mean_abs_percentage_err)
+
+
+def iris_data_metrics(trainX, trainY, threshold, classnames):
+    print("======================Classification - Full Training Set=========================\n")
+    model = LogisticRegression(trainX, trainY, np.array([0, 0, 0, 0]), 0.05, 1e-5, 1e-12, 'Iris Data')
+    model.train()
+    prediction = np.where(model.predict(validationX).values > threshold, 1, 0)
+    confusion_matrix = metrics.confusion_matrix(validationY.values, prediction)
+    tn, fp, fn, tp = confusion_matrix.ravel()
+    print('Precision: ', metrics.precision_score(validationY.values, prediction))
+    print('Recall: ', metrics.recall_score(validationY.values, prediction))
+    print('FPR: ', fp / (fp + tn))
+    fpr, tpr, _ = metrics.roc_curve(validationY.values, prediction)
+    roc_auc = metrics.auc(fpr, tpr)
+    display = metrics.RocCurveDisplay(fpr=fpr, tpr=tpr, roc_auc=roc_auc, estimator_name='Iris Data')
+    display.plot()
+    plt.show()
+    plot_confusion_matrix(confusion_matrix, class_names, threshold)
+
+
+def iris_data_metrics_k_fold(trainX, trainY, threshold, classnames):
+    print("======================Classification - K-Fold Iterations (K=5)=========================\n")
+    k = 5
+    for i in range(k):
+        print("=============Iteration Number " + str(i + 1) + "================")
+        k_trainX, k_trainY, k_validationX, k_validationY = k_fold_split(trainX, trainY, k, i + 1)
+        model = LogisticRegression(trainX, trainY, np.array([0, 0, 0, 0]), 0.05, 1e-5, 1e-12, 'Iris Data')
+        model.train()
+        prediction = np.where(model.predict(validationX).values > threshold, 1, 0)
+        confusion_matrix = metrics.confusion_matrix(validationY.values, prediction)
+        tn, fp, fn, tp = confusion_matrix.ravel()
+        print('Precision: ', metrics.precision_score(validationY.values, prediction))
+        print('Recall: ', metrics.recall_score(validationY.values, prediction))
+        print('FPR: ', fp / (fp + tn))
+        fpr, tpr, _ = metrics.roc_curve(validationY.values, prediction)
+        roc_auc = metrics.auc(fpr, tpr)
+        display = metrics.RocCurveDisplay(fpr=fpr, tpr=tpr, roc_auc=roc_auc, estimator_name='Iris Data')
+        display.plot()
+        plt.show()
+        plot_confusion_matrix(confusion_matrix, class_names, threshold)
 
 if __name__ == "__main__":
     # plot_univar_func(lambda x: sigmoid(x), -10, 10, "Sigmoid")
@@ -79,42 +144,15 @@ if __name__ == "__main__":
     # plot_gradient_descent_path(affine_function(FIRST_VECTOR, FIRST_CONSTANT), points, "Affine Function First Vector")
     # plot_gradient_descent_path(affine_function(SECOND_VECTOR, SECOND_CONSTANT), points, "Affine Function First Vector")
     # plot_gradient_descent_path(rosenbrock, points, "Rosenbrock")
-    trainX, trainY, validationX, validationY = prepare_boston_data()
-    # print("======================Full Training Set=========================")
-    # model = LinearRegression(trainX, trainY, np.array([0, 0, 0]), 0.001, 1e-5, 1e-12, 'Boston Housing Prices')
-    # model.train()
-    # prediction = model.evaluate_model(validationX, validationY)
-    # mean_sqr_err = (np.linalg.norm(validationY.values - prediction.values) ** 2) / len(validationY)
-    # mean_abs_percentage_err = np.mean(np.abs((validationY.values - prediction.values) / validationY.values)) * 100
-    # print("Mean Square Error", mean_sqr_err)
-    # print("Mean Absolute Percentage Error", mean_abs_percentage_err)
 
-    print("======================K-Fold Iterations (K=5)=========================")
-    k = 5
-    for i in range(k):
-        print("=====Iteration Number " + str(i + 1) + "======")
-        k_trainX, k_trainY, k_validationX, k_validationY = k_fold_split(trainX, trainY, k, i + 1)
-        model = LinearRegression(k_trainX, k_trainY, np.array([0, 0, 0]), 0.001, 1e-5, 1e-12, 'Boston Housing Prices')
-        model.train()
-        prediction = model.evaluate_model(k_validationX, k_validationY)
-        mean_sqr_err = (np.linalg.norm(k_validationY.values - prediction.values) ** 2) / len(k_validationY)
-        mean_abs_percentage_err = np.mean(np.abs((k_validationY.values - prediction.values) / k_validationY.values)) * 100
-        print("Mean Square Error", mean_sqr_err)
-        print("Mean Absolute Percentage Error", mean_abs_percentage_err)
+    # Regression
+
+    trainX, trainY, validationX, validationY = prepare_boston_data()
+    boston_housing_prices_full(trainX, trainY)
+    boston_housing_prices_k_fold(trainX, trainY)
+
     # Classification
 
-    # class_names, (trainX, trainY, validationX, validationY) = prepare_iris_data()
-    # model = LogisticRegression(trainX, trainY, np.array([0, 0, 0, 0]), 0.05, 1e-5, 1e-12, 'Iris Data')
-    # model.train()
-    # model.evaluate_model(validationX, validationY)
-    # confusion_matrix = metrics.confusion_matrix(validationY.values, np.where(model.predict(validationX).values > 0.97, 1, 0))
-    # tn, fp, fn, tp = confusion_matrix.ravel()
-    # print('Precision', metrics.precision_score(validationY.values, np.where(model.predict(validationX).values > 0.97, 1, 0)))
-    # print('Recall', metrics.recall_score(validationY.values, np.where(model.predict(validationX).values > 0.97, 1, 0)))
-    # print('FPR', fp / (fp + tn))
-    # fpr, tpr, _ = metrics.roc_curve(validationY.values, np.where(model.predict(validationX).values > 0.97, 1, 0))
-    # roc_auc = metrics.auc(fpr, tpr)
-    # display = metrics.RocCurveDisplay(fpr=fpr, tpr=tpr, roc_auc=roc_auc, estimator_name='Iris Data')
-    # display.plot()
-    # plt.show()
-    # plot_confusion_matrix(confusion_matrix, class_names, 0.97)
+    class_names, (trainX, trainY, validationX, validationY) = prepare_iris_data()
+    iris_data_metrics(trainX, trainY, 0.98, class_names)
+    iris_data_metrics_k_fold(trainX, trainY, 0.98, class_names)
