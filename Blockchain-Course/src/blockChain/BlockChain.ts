@@ -24,12 +24,11 @@ export class BlockChain {
 
     minePendingTransactions(miningRewardAddress: string): void {
         const transactionReward = new Transaction(null, miningRewardAddress, this.miningReward);
-        this.pendingTransactions = [...this.pendingTransactions, transactionReward];
-        const block = new Block(Date.now().toString(), this.pendingTransactions, this.getLatestBlock().hash);
+        const transactionToMine = [...this.pendingTransactions.slice(0, 4), transactionReward];
+        const block = new Block(Date.now().toString(), transactionToMine, this.getLatestBlock().hash);
         block.mineBlock(this.difficulty);
-        console.log("Block successfuly mined!");
+        this.pendingTransactions = this.pendingTransactions.filter((tran) => !transactionToMine.find((tr) => tr.calculateHash() === tran.calculateHash()));
         this.chain = [...this.chain, block];
-        this.pendingTransactions = [];
     }
 
     getAddressBalance(address: string): number {
@@ -62,6 +61,16 @@ export class BlockChain {
             }
             return block.hash === block.calculateHash() && block.hash === this.chain[i+1].previousHash;
         });
+    }
+
+    findTranscation(txHash: string): Block | undefined {
+        return this.chain.find((block) => {
+            return block.hasTransaction(txHash);
+        });
+      }
+
+    get blockHeaders(): string[] {
+        return this.chain.map((block) => block.calculateHash());
     }
 
     get chain(): Block[] {

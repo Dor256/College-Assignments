@@ -1,6 +1,7 @@
 import SHA256 from "crypto-js/sha256";
 import MerkleTree from "merkletreejs/dist/index";
 import { Transaction } from "./Transaction";
+import { BloomFilter } from "bloomfilter";
 
 export type Data = {
     amount: number
@@ -13,6 +14,7 @@ export class Block {
     private _hash: string;
     private _nonce: number;
     private merkletree: any;
+    private bloomFilter: BloomFilter;
 
     constructor(timestamp: string, transactions: Transaction[], previousHash = '') {
         this.timestamp = timestamp;
@@ -21,10 +23,11 @@ export class Block {
         this._nonce = 0;
         this._hash = this.calculateHash();
         this.merkletree = new MerkleTree(transactions.map((leaf) => leaf.calculateHash()), SHA256);
+        this.bloomFilter = new BloomFilter(8192, 16);
     }
 
     calculateHash(): string {
-        return SHA256(this.previousHash + this.timestamp + JSON.stringify(this.transactions) + this.nonce).toString();
+        return SHA256(this.previousHash + this.timestamp + this.merkletree + this.nonce).toString();
     }
     
     mineBlock(difficulty: number): void {
@@ -33,10 +36,22 @@ export class Block {
             this.hash = this.calculateHash();
         }
         console.log(`Block Mined: ${this.hash}`);
+        this.initBloomFilter();
     }
 
     hasValidTransactions(): boolean {
         return this.transactions.every((transaction) => transaction.isValid());
+    }
+
+    initBloomFilter(): void {
+        this.transactions.forEach((transction) => this.bloomFilter.add(transction.calculateHash()));
+    }
+
+    hasTransaction(txHash: string): boolean {
+        if (this.bloomFilter.test(txHash)) {
+            return this.transactions.map((transaction) => transaction.calculateHash()).includes(txHash);
+        }
+        return false;
     }
 
     get previousHash(): string {
