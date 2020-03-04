@@ -1,13 +1,13 @@
 {
     "env": {
         "browser": true,
-        "es6": true
+        "es6": true,
+        "node": true
     },
     "extends": [
         "eslint:recommended",
         "plugin:@typescript-eslint/eslint-recommended",
-        "plugin:@typescript-eslint/recommended",
-        "plugin:react/recommended"
+        "plugin:@typescript-eslint/recommended"
     ],
     "globals": {
         "Atomics": "readonly",
@@ -37,8 +37,6 @@
             }
         }],
         "react/prop-types": 0,
-        "object-curly-spacing": ["warn", "always"],
-        "react/jsx-wrap-multilines": ["warn", { "return": "parens-new-line" }],
-        "jsx-quotes": ["warn", "prefer-single"]
+        "object-curly-spacing": ["warn", "always"]
     }
 }
