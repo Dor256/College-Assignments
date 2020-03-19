@@ -1,19 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" type='text/css' href="styles.css">
-    <title>Home</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
+	<link rel="stylesheet" type='text/css' href="styles.css">
+	<title>Home</title>
 </head>
 <body>
-    <h1>The top 5 sites that I've visited</h1>
-    <div class='container'>
-        <a href="/nyc">New York City</a>
-        <a href="/angelus">Angelus Hut</a>
-        <a href="/doom">Mount Doom</a>
-        <a href="/milford">Milford Sound</a>
-        <a href="/ir">Glendalough</a>
-    </div>
+	<div class='container'>
+		<h1 class='title'>The top 5 sites that I've visited</h1>
+		<a class='navigator' href="/nyc">New York City <i class="arrow alternate circle right outline icon"></i></a>
+		<a class='navigator' href="/angelus">Angelus Hut <i class="arrow alternate circle right outline icon"></i></a>
+		<a class='navigator' href="/doom">Mount Doom <i class="arrow alternate circle right outline icon"></i></a>
+		<a class='navigator' href="/milford">Milford Sound <i class="arrow alternate circle right outline icon"></i></a>
+		<a class='navigator' href="/ir">Glendalough <i class="arrow alternate circle right outline icon"></i></a>
+		<div class='map-container'>
+			<img class='map' src="map.png" alt="">
+			<a href="/milford" class="marker milford tooltip tooltip-marker"><span class="tooltip-text tooltip-marker-text">Milford Sound</span><i class="map marker alternate icon"></i></a>
+			<a href="/doom" class="marker doom tooltip tooltip-marker"><span class="tooltip-text tooltip-marker-text">Mount Doom</span><i class="map marker alternate icon"></i></a>
+			<a href="/angelus" class="marker angelus tooltip tooltip-marker"><span class="tooltip-text tooltip-marker-text">Angelus Hut</span><i class="map marker alternate icon"></i></a>
+			<a href="/ir" class="marker ir tooltip tooltip-marker"><span class="tooltip-text tooltip-marker-text">Glendalough</span><i class="map marker alternate icon"></i></a>
+			<a href="/nyc" class="marker nyc tooltip tooltip-marker"><span class="tooltip-text tooltip-marker-text">New York City</span><i class="map marker alternate icon"></i></a>
+		</div>
+	</div>
 </body>
 </html>
