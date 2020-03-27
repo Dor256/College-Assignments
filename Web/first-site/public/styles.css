@@ -17,6 +17,7 @@
     border-radius: 50px;
     font-size: 15px;
     font-weight: 700;
+    margin-bottom: 5%;
 }
 
 .back-button:hover {
@@ -39,17 +40,6 @@
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-}
-
-.map-container {
-    position: relative;
-    width: 100%;
-}
-
-.marker {
-    position: absolute;
-    color: rgb(179, 55, 55);
-    font-size: 25px;
 }
 
 .ir {
@@ -81,58 +71,21 @@ img.map {
     margin-top: 5%
 }
 
-img {
+img.location {
     width: 100%;
+}
+
+img {
     border-radius: 50px;
     box-shadow: 0px 0px 5px 0.4px;
     margin-bottom: 25px;
 }
 
+blockquote {
+    margin-bottom: 3%;
+}
+
 h1.title {
     font-size: 43px;
     margin: 5% 0 3% 0;
-}
-
-.tooltip {
-    display: inline-block;
-    cursor: pointer;
-}
-
-.tooltip-marker-text {
-    visibility: hidden;
-    font-family: 'Open Sans', sans-serif;
-    font-weight: normal;
-    width: 120px;
-    height: 37px;
-    background-color: rgb(179, 55, 55);
-    color: #fff;
-    text-align: center;
-    border-radius: 6px;
-    padding: 10px 0px 10px 0px;
-    position: absolute;
-    z-index: 1;
-    bottom: 125%;
-    left: 50%;
-    margin-left: -46px;
-    opacity: 0;
-    transition: opacity 0.3s;
-    font-size: 15px;
-    text-transform: capitalize;
-    margin-bottom: 10px;
-}
-
-.tooltip-marker-text::after {
-    content: "";
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    margin-left: -5px;
-    border-width: 5px;
-    border-style: solid;
-    border-color: rgb(179, 55, 55) transparent transparent transparent;
-}
-
-.tooltip-marker:hover .tooltip-marker-text {
-    visibility: visible;
-    opacity: 1;
 }

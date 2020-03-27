@@ -15,14 +15,14 @@
 		<a class='navigator' href="/doom">Mount Doom <i class="arrow alternate circle right outline icon"></i></a>
 		<a class='navigator' href="/milford">Milford Sound <i class="arrow alternate circle right outline icon"></i></a>
 		<a class='navigator' href="/ir">Glendalough <i class="arrow alternate circle right outline icon"></i></a>
-		<div class='map-container'>
-			<img class='map' src="map.png" alt="">
-			<a href="/milford" class="marker milford tooltip tooltip-marker"><span class="tooltip-text tooltip-marker-text">Milford Sound</span><i class="map marker alternate icon"></i></a>
-			<a href="/doom" class="marker doom tooltip tooltip-marker"><span class="tooltip-text tooltip-marker-text">Mount Doom</span><i class="map marker alternate icon"></i></a>
-			<a href="/angelus" class="marker angelus tooltip tooltip-marker"><span class="tooltip-text tooltip-marker-text">Angelus Hut</span><i class="map marker alternate icon"></i></a>
-			<a href="/ir" class="marker ir tooltip tooltip-marker"><span class="tooltip-text tooltip-marker-text">Glendalough</span><i class="map marker alternate icon"></i></a>
-			<a href="/nyc" class="marker nyc tooltip tooltip-marker"><span class="tooltip-text tooltip-marker-text">New York City</span><i class="map marker alternate icon"></i></a>
-		</div>
+		<img class='map' src="map.png" usemap="#worldMap">
+		<map name="worldMap">
+			<area alt="Milford Sound" title="Milford Sound" href="/milford" coords="58,345,66,357" shape="rect">
+			<area alt="Angelus Hut" title="Angelus Hut" href="/angelus" coords="68,340,77,354" shape="rect">
+			<area alt="Mount Doom" title="Mount Doom" href="/doom" coords="80,326,92,339" shape="rect">
+			<area alt="New York City" title="New York City" href="/nyc" coords="384,79,394,94" shape="rect">
+			<area alt="Glendalough" title="Glendalough" href="/ir" coords="569,32,581,49" shape="rect">
+		</map>
 	</div>
 </body>
 </html>
