@@ -191,7 +191,7 @@ function getSprites(canvas, ctx, state) {
         this.value = 0;
       }
     }
-  }
+  };
 
   const gameOver = {
     sX: 175,
