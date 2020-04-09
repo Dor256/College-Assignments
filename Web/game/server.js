@@ -24,27 +24,16 @@ var players = {};
 io.on('connection', function(socket) {
   socket.on('new player', function() {
     players[socket.id] = {
-      x: 300,
-      y: 300
+      x: 50,
+      y: 156
     };
   });
-  socket.on('movement', function(data) {
+  socket.on('jump', function(data) {
     var player = players[socket.id] || {};
-    if (data.left) {
-      player.x -= 5;
-    }
-    if (data.up) {
-      player.y -= 5;
-    }
-    if (data.right) {
-      player.x += 5;
-    }
-    if (data.down) {
-      player.y += 5;
-    }
+    player.flap = data;
   });
 });
 
 setInterval(function() {
   io.sockets.emit('state', players);
-}, 1000 / 60);
+}, 1000 / 70);

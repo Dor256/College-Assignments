@@ -85,13 +85,13 @@ function getSprites(canvas, ctx, state) {
       if (atMenu) {
         this.rotation = 0 * DEGREE;
         this.y = 150;
-        this.speed = 0;
       } else {
         this.speed += this.gravity;
         if (this.birdHitGround()) {
           this.y = canvas.height - foreground.h - this.h / 2;
           if (state.current == state.game) {
             state.current = state.over;
+            sounds.DIE.play();
           }
         } else {
           this.y += this.speed;
@@ -104,14 +104,22 @@ function getSprites(canvas, ctx, state) {
         }
       }
     },
-    flap() {
-      this.speed = -this.jump;
+    flap(flap) {
+      if (flap && !this.birdHitTop()) {
+        this.speed = -this.jump;
+      }
     },
     birdHitGround() {
       return this.y + this.h / 2 >= canvas.height - foreground.h;
     },
     birdIsFalling() {
       return this.speed >= this.jump;
+    },
+    birdHitTop() {
+      return this.y - this.radius <= canvas.getBoundingClientRect().top;
+    },
+    resetSpeed() {
+      bird.speed = 0;
     }
   };
 
@@ -131,9 +139,6 @@ function getSprites(canvas, ctx, state) {
     position: [],
     maxYPos: -175,
     draw() {
-      if (state.current == state.getReady) {
-        this.position = [];
-      }
       this.position.forEach((pipe) => {
         const topY = pipe.y;
         const bottomY = pipe.y + this.h + this.gap;
@@ -153,10 +158,12 @@ function getSprites(canvas, ctx, state) {
         pipe.x -= this.dx;
         if (this.birdHasCollided(pipe)) {
           state.current = state.over;
+          sounds.HIT.play();
         }
         if (pipe.x + this.w <= 0) {
           this.position.shift();
           score.value++;
+          sounds.SCORE.play();
           score.best = Math.max(score.value, score.best);
           localStorage.setItem("best", score.best);
         }
@@ -166,6 +173,9 @@ function getSprites(canvas, ctx, state) {
       const bottomPipeY = pipe.y + this.gap + this.h;
       return (bird.x + bird.radius > pipe.x && bird.x -bird.radius < pipe.x + this.w && bird.y + bird.radius > pipe.y && bird.y - bird.radius < pipe.y + this.h) 
         || (bird.x + bird.radius > pipe.x && bird.x - bird.radius < pipe.x + this.w && bird.y + bird.radius > bottomPipeY && bird.y - bird.radius < bottomPipeY + this.h);
+    },
+    reset() {
+      pipes.position = [];
     }
   };
 
@@ -187,9 +197,10 @@ function getSprites(canvas, ctx, state) {
         ctx.strokeText(this.value, 225, 186);
         ctx.fillText(this.best, 225, 228);
         ctx.strokeText(this.best, 225, 228);
-      } else {
-        this.value = 0;
       }
+    },
+    reset() {
+      score.value = 0;
     }
   };
 
