@@ -57,16 +57,16 @@ function getSprites(canvas, ctx, state) {
       { sX: 253, sY: 279 },
       { sX: 125, sY: 278 }
     ],
-    dead: { sX: 190, sY: 216 },
+    dead: { sX: 190, sY: 210 },
     w: 55,
     h: 50,
     x: 50,
-    y: 156,
+    y: 1506,
     radius: 20,
     frame: 0,
     speed: 0,
-    gravity: 0.25,
-    jump: 4.6,
+    gravity: 0,
+    jump: 0,
     rotation: 0,
     draw() {
       const bird = state.current == state.over ? this.dead : this.animation[this.frame];
@@ -96,12 +96,6 @@ function getSprites(canvas, ctx, state) {
         } else {
           this.y += this.speed;
         }
-        if (this.birdIsFalling()) {
-          this.rotation = 90 * DEGREE;
-          this.frame = 1;
-        } else {
-          this.rotation = -25 * DEGREE;
-        }
       }
     },
     flap(flap) {
@@ -111,9 +105,6 @@ function getSprites(canvas, ctx, state) {
     },
     birdHitGround() {
       return this.y + this.h / 2 >= canvas.height - foreground.h;
-    },
-    birdIsFalling() {
-      return this.speed >= this.jump;
     },
     birdHitTop() {
       return this.y - this.radius <= canvas.getBoundingClientRect().top;

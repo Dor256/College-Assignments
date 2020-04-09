@@ -28,9 +28,20 @@ io.on('connection', function(socket) {
       y: 156
     };
   });
-  socket.on('jump', function(data) {
+  socket.on('movement', function(data) {
     var player = players[socket.id] || {};
-    player.flap = data;
+    if (data.left) {
+      player.x -= 5;
+    }
+    if (data.up) {
+      player.y -= 5;
+    }
+    if (data.right) {
+      player.x += 5;
+    }
+    if (data.down) {
+      player.y += 5;
+    }
   });
 });
 
