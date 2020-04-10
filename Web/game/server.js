@@ -20,16 +20,22 @@ server.listen(5000, function() {
   console.log('Starting server on port 5000');
 });
 
-var players = {};
+let playerNumber = 0;
+let players = {};
 io.on('connection', function(socket) {
   socket.on('new player', function() {
     players[socket.id] = {
       x: 50,
-      y: 156
+      y: 150,
+      dead: false,
+      no: playerNumber++
     };
   });
   socket.on('movement', function(data) {
-    var player = players[socket.id] || {};
+    const player = players[socket.id] || {};
+    if (player.dead) {
+      return;
+    }
     if (data.left) {
       player.x -= 5;
     }
@@ -43,8 +49,12 @@ io.on('connection', function(socket) {
       player.y += 5;
     }
   });
+  socket.on('death', function(data) {
+    const player = players[data] || {};
+    player.dead = true;
+  });
 });
 
 setInterval(function() {
   io.sockets.emit('state', players);
-}, 1000 / 70);
+}, 1000 / 50);

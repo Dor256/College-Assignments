@@ -79,15 +79,27 @@ document.addEventListener('keydown', function(event) {
   switch (event.keyCode) {
     case KEYS.LEFT:
     case KEYS.A:
-      movement = { ...movement, left: true };
+      if (sprites.bird.birdHitLeftEdge(sprites.bird.x - 5)) {
+        movement = { ...movement, left: false };
+      } else {
+        movement = { ...movement, left: true };
+      }
       break;
     case KEYS.UP:
     case KEYS.W:
-      movement = { ...movement, up: true };
+      if (sprites.bird.birdHitTop(sprites.bird.y - 10)) {
+        movement = { ...movement, up: false };
+      } else {
+        movement = { ...movement, up: true };
+      }
       break;
     case KEYS.RIGHT:
     case KEYS.D:
-      movement = { ...movement, right: true };
+      if (sprites.bird.birdHitRightEdge(sprites.bird.x + 10)) {
+        movement = { ...movement, right: false };
+      } else {
+        movement = { ...movement, right: true };
+      }
       break;
     case KEYS.DOWN:
     case KEYS.S:
@@ -124,38 +136,40 @@ function draw() {
   sprites.background.draw();
   sprites.foreground.draw();
   sprites.pipes.draw();
-  sprites.bird.draw();
-  sprites.getReady.draw();
-  sprites.gameOver.draw();
   sprites.score.draw();
 };
 
 function update() {
-  sprites.bird.update();
   sprites.foreground.update();
+  sprites.bird.update();
   sprites.pipes.update();
 };
 
-// function loop() {
-//   update();
-//   draw();
-//   frames++;
-//   requestAnimationFrame(loop);
-// };
-
-// loop();
-
 socket.emit('new player');
 
-socket.on('state', (players) => {
+socket.on('state', function(players) {
   ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-  Object.values(players).forEach((player) => {
-    sprites.bird.x = player.x;
-    sprites.bird.y = player.y;
-    draw();
+  update();
+  draw();
+  Object.entries(players).forEach(([id, player]) => {
+    if (sprites.bird.playerHitGround(player)) {
+      socket.emit('death', id);
+    }
+    if (!player.dead) {
+      sprites.bird.flap(player.x, player.y);
+    }
+    if (sprites.bird.birdHitLeftEdge(player.x - 5)) {
+      movement = { ...movement, left: false };
+    }
+    if (sprites.bird.birdHitTop(player.y - 10)) {
+      movement = { ...movement, up: false };
+    }
+    if (sprites.bird.birdHitRightEdge(player.x + 10)) {
+      movement = { ...movement, right: false };
+    }
+    sprites.bird.draw(player);
   });
   frames++;
-  update();
 });
 
 setInterval(function() { socket.emit('movement', movement) }, 1000 / 60);

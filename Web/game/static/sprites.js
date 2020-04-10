@@ -1,7 +1,9 @@
 const baseSprite = new Image();
-const extraSprite = new Image();
+const playerOne = new Image();
+const playerTwo = new Image();
 baseSprite.src = "static/assets/img/sprite.png";
-extraSprite.src = "static/assets/img/tinySprite.png";
+playerOne.src = "static/assets/img/playerOne.png";
+playerTwo.src = "static/assets/img/playerTwo.png";
 
 function getSprites(canvas, ctx, state) {
   const background = {
@@ -45,35 +47,44 @@ function getSprites(canvas, ctx, state) {
     y: 150,
     draw() {
       if (state.current == state.getReady) {
-        ctx.drawImage(extraSprite, this.sX, this.sY, this.w, this.h, this.x, this.y, this.w, this.h);
+        ctx.drawImage(playerOne, this.sX, this.sY, this.w, this.h, this.x, this.y, this.w, this.h);
       }
     }
   };
   
   const bird = {
     animation: [
-      { sX: 253, sY: 214 },
-      { sX: 125, sY: 278 },
-      { sX: 253, sY: 279 },
-      { sX: 125, sY: 278 }
+        [
+          { sX: 253, sY: 214 },
+          { sX: 125, sY: 278 },
+          { sX: 253, sY: 279 },
+          { sX: 125, sY: 278 }
+        ],
+        [
+          { sX: 517, sY: 113 },
+          { sX: 517, sY: 301 },
+          { sX: 447, sY: 510 },
+          { sX: 517, sY: 301 }
+        ]
     ],
-    dead: { sX: 190, sY: 210 },
+    deadAnimation: [{ sX: 190, sY: 210 }, { sX: 517, sY: 208 }],
+    dead: false,
     w: 55,
     h: 50,
     x: 50,
-    y: 1506,
+    y: 150,
     radius: 20,
     frame: 0,
     speed: 0,
     gravity: 0,
     jump: 0,
     rotation: 0,
-    draw() {
-      const bird = state.current == state.over ? this.dead : this.animation[this.frame];
+    draw(player) {
+      const bird = player.dead ? this.deadAnimation[player.no] : this.animation[player.no][this.frame];
+      const sprite = player.no == 0 ? playerOne : playerTwo;
       ctx.save();
-      ctx.translate(this.x, this.y);
-      ctx.rotate(this.rotation);
-      ctx.drawImage(extraSprite, bird.sX, bird.sY, this.w, this.h, -this.w / 2, -this.h / 2, this.w, this.h);
+      ctx.translate(player.x, player.y);
+      ctx.drawImage(sprite, bird.sX, bird.sY, this.w, this.h, -this.w / 2, -this.h / 2, this.w, this.h);
       ctx.restore();
     },
     update() {
@@ -88,26 +99,35 @@ function getSprites(canvas, ctx, state) {
       } else {
         this.speed += this.gravity;
         if (this.birdHitGround()) {
-          this.y = canvas.height - foreground.h - this.h / 2;
           if (state.current == state.game) {
             state.current = state.over;
             sounds.DIE.play();
           }
-        } else {
-          this.y += this.speed;
         }
       }
     },
-    flap(flap) {
-      if (flap && !this.birdHitTop()) {
-        this.speed = -this.jump;
+    flap(x, y) {
+      if (!this.birdHitTop(y)) {
+        this.y = y;
       }
+      if (!this.birdHitRightEdge(x) && !this.birdHitLeftEdge(x)) {
+        this.x = x;
+      }
+    },
+    playerHitGround(player) {
+      return player.y + this.h / 2 >= canvas.height - foreground.h;
     },
     birdHitGround() {
       return this.y + this.h / 2 >= canvas.height - foreground.h;
     },
-    birdHitTop() {
-      return this.y - this.radius <= canvas.getBoundingClientRect().top;
+    birdHitTop(y) {
+      return y - this.radius <= canvas.getBoundingClientRect().top;
+    },
+    birdHitRightEdge(x) {
+      return x + this.radius >= canvas.getBoundingClientRect().width;
+    },
+    birdHitLeftEdge(x) {
+      return x - this.radius <= 0;
     },
     resetSpeed() {
       bird.speed = 0;

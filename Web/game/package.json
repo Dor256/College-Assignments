@@ -1,22 +1,17 @@
 {
-  "name": "how-to-make-a-multiplayer-game",
+  "name": "flappy-bird",
   "version": "1.0.0",
-  "description": "A tutorial for creating multiplayer browser games",
+  "description": "Custom Flappy Bird Multiplayer Game",
   "main": "server.js",
   "scripts": {
     "test": "node server.js",
-    "start": "node server.js"
+    "start": "open -a \"Google Chrome\" http://localhost:5000 && node server.js"
   },
   "repository": {
-    "type": "git",
-    "url": "git+ssh://git@github.com/omgimanerd/how-to-make-a-multiplayer-game.git"
+    "type": "git"
   },
-  "author": "Alvin Lin (omgimanerd)",
+  "author": "Dor",
   "license": "WTFPL",
-  "bugs": {
-    "url": "https://github.com/omgimanerd/how-to-make-a-multiplayer-game/issues"
-  },
-  "homepage": "https://github.com/omgimanerd/how-to-make-a-multiplayer-game#readme",
   "dependencies": {
     "express": "^4.14.0",
     "socket.io": "^1.7.2"
