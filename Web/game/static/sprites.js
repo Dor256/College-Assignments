@@ -89,9 +89,9 @@ function getSprites(canvas, ctx, state) {
     },
     update() {
       const atMenu = state.current == state.getReady;
-      this.period = atMenu ? SLOW_FLAP : FAST_FLAP;
+      this.period = FAST_FLAP;
       this.frame += frames % this.period == 0 ? 1 : 0;
-      this.frame = this.frame % this.animation.length;
+      this.frame = this.frame % this.animation[0].length;
 
       if (atMenu) {
         this.rotation = 0 * DEGREE;
@@ -158,19 +158,22 @@ function getSprites(canvas, ctx, state) {
         ctx.drawImage(baseSprite, this.bottom.sX, this.bottom.sY, this.w, this.h, pipe.x, bottomY, this.w, this.h);
       });
     },
-    update() {
+    update(players, calc) {
       if (state.current !== state.game) {
         return;
       }
       if (frames % 100 == 0) {
-        this.position.push({ x: canvas.width, y: this.maxYPos * (Math.random() + 1) });
+        this.position.push({ x: canvas.width, y: this.maxYPos * calc });
       }
       this.position.forEach((pipe) => {
         pipe.x -= this.dx;
-        if (this.birdHasCollided(pipe)) {
-          state.current = state.over;
-          sounds.HIT.play();
-        }
+        Object.entries(players).forEach(([id, player]) => {
+          if (this.birdHasCollided(pipe, player)) {
+            // state.current = state.over;
+            socket.emit('death', id);
+            sounds.HIT.play();
+          }
+        });
         if (pipe.x + this.w <= 0) {
           this.position.shift();
           score.value++;
@@ -180,10 +183,10 @@ function getSprites(canvas, ctx, state) {
         }
       });
     },
-    birdHasCollided(pipe) {
+    birdHasCollided(pipe, player) {
       const bottomPipeY = pipe.y + this.gap + this.h;
-      return (bird.x + bird.radius > pipe.x && bird.x -bird.radius < pipe.x + this.w && bird.y + bird.radius > pipe.y && bird.y - bird.radius < pipe.y + this.h) 
-        || (bird.x + bird.radius > pipe.x && bird.x - bird.radius < pipe.x + this.w && bird.y + bird.radius > bottomPipeY && bird.y - bird.radius < bottomPipeY + this.h);
+      return (player.x + bird.radius > pipe.x && player.x -bird.radius < pipe.x + this.w && player.y + bird.radius > pipe.y && player.y - bird.radius < pipe.y + this.h) 
+        || (player.x + bird.radius > pipe.x && player.x - bird.radius < pipe.x + this.w && player.y + bird.radius > bottomPipeY && player.y - bird.radius < bottomPipeY + this.h);
     },
     reset() {
       pipes.position = [];
@@ -228,7 +231,29 @@ function getSprites(canvas, ctx, state) {
       }
     }
   };
+
+  const bauble = {
+    sX: 391,
+    sY: 78,
+    w: 55,
+    h: 50,
+    draw() {
+      if (state.current != state.over) {
+      }
+    }
+  };
+
+  const hostile = {
+    sX: 410,
+    sY: 218,
+    w: 65,
+    h: 30,
+    draw() {
+      if (state.current != state.over) {
+      }
+    }
+  };
   
-  return { background, foreground, bird, getReady, gameOver, pipes, score };
+  return { background, foreground, bird, getReady, gameOver, pipes, score, hostile, bauble };
 };
 

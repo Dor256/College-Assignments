@@ -56,5 +56,5 @@ io.on('connection', function(socket) {
 });
 
 setInterval(function() {
-  io.sockets.emit('state', players);
+  io.sockets.emit('state', { players, calc: Math.random() + 1 });
 }, 1000 / 50);

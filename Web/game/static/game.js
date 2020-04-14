@@ -12,7 +12,7 @@ let movement = {
 }
 
 const state = {
-  current: 1,
+  current: 0,
   getReady: 0,
   game: 1,
   over: 2
@@ -79,7 +79,7 @@ document.addEventListener('keydown', function(event) {
   switch (event.keyCode) {
     case KEYS.LEFT:
     case KEYS.A:
-      if (sprites.bird.birdHitLeftEdge(sprites.bird.x - 5)) {
+      if (sprites.bird.birdHitLeftEdge(sprites.bird.x - 10)) {
         movement = { ...movement, left: false };
       } else {
         movement = { ...movement, left: true };
@@ -142,14 +142,20 @@ function draw() {
 function update() {
   sprites.foreground.update();
   sprites.bird.update();
-  sprites.pipes.update();
 };
 
 socket.emit('new player');
 
-socket.on('state', function(players) {
+socket.on('state', function({ players, calc }) {
   ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
   update();
+  if (Object.keys(players).length == 2) {
+    if (state.current == state.getReady) {
+      frames = 0;
+    }
+    state.current = state.game;
+    sprites.pipes.update(players, calc);
+  }
   draw();
   Object.entries(players).forEach(([id, player]) => {
     if (sprites.bird.playerHitGround(player)) {
@@ -158,7 +164,7 @@ socket.on('state', function(players) {
     if (!player.dead) {
       sprites.bird.flap(player.x, player.y);
     }
-    if (sprites.bird.birdHitLeftEdge(player.x - 5)) {
+    if (sprites.bird.birdHitLeftEdge(player.x - 10)) {
       movement = { ...movement, left: false };
     }
     if (sprites.bird.birdHitTop(player.y - 10)) {
@@ -169,7 +175,7 @@ socket.on('state', function(players) {
     }
     sprites.bird.draw(player);
   });
-  frames++;
+  frames++
 });
 
-setInterval(function() { socket.emit('movement', movement) }, 1000 / 60);
+setInterval(function() { socket.emit('movement', movement) }, 1000 / 50);
