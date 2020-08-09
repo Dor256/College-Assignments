@@ -14,7 +14,7 @@
     "@types/node": "^12.12.7",
     "bloomfilter": "0.0.18",
     "crypto-js": "^3.1.9-1",
-    "elliptic": "^6.5.2",
+    "elliptic": "^6.5.3",
     "fully-connected-topology": "^1.1.1",
     "merkletreejs": "^0.1.7",
     "tsc": "^1.20150623.0",
