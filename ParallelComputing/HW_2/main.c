@@ -1,56 +1,65 @@
-
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <mpi.h>
 
 #include "triplet.h"
 
-#define NOT_ENOUGTH_PROCS_STR "proccesses needed in order to run the program\n"
-#define INPUT "input.dat"
-#define OUTPUT "result.dat"
+#define OUTPUT "output.dat"
 
 int main(int argc, char *argv[]) {
-	int workersCount, rank;
+	char *fileName = argv[1];
+	int numOfWorkers, rank;
 	int dim[CART_DIM], period[CART_DIM], reorder = 0, coord[CART_DIM];
 	MPI_Comm comm;
 	Triplet receivedTriplet;
-
-	Triplet triplets[16];
+	int numOfTriplets;
+	Triplet *triplets = (Triplet*) malloc(sizeof(Triplet));
 
 	//Init MPI:
 	MPI_Init(&argc, &argv);
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-	MPI_Comm_size(MPI_COMM_WORLD, &workersCount);
-	// if (workersCount != AMOUNT_OF_CUBOIDS) {
-	// 	printf("%d",AMOUNT_OF_CUBOIDS);
-	// 	printf(NOT_ENOUGTH_PROCS_STR);
-	// 	MPI_Finalize();
-	// 	return 1;
-	// }
+	MPI_Comm_size(MPI_COMM_WORLD, &numOfWorkers);
 
 	MPI_Datatype MPI_TRIPLET = MPITypeFromTriplet();
 
+	// Master rank prints array before sort
 	if (isMaster(rank)) {
-		readTripletsFromFile(INPUT, triplets);
+		if (fileName) {
+			triplets = readTripletsFromFile(fileName, triplets, &numOfTriplets);
+		} else {
+			printf("No file entered, please insert triplets separated by $ signs: ");
+			triplets = readTripletsFromInput(triplets, &numOfTriplets);
+		}
 		printf("\n--------------- Unsorted: ---------------\n");
-		printAllTriplets(triplets, 16);
+		printAllTriplets(triplets, numOfTriplets);
 	}
 
+	// Send the number of triplets to all processes
+	MPI_Bcast(&numOfTriplets, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
+	// Divide jobs between processes
 	MPI_Scatter(triplets, 1, MPI_TRIPLET, &receivedTriplet, 1, MPI_TRIPLET, 0, MPI_COMM_WORLD);
-	createCart(dim, period, reorder, &comm);
+	createCart(dim, period, reorder, &comm, sqrt(numOfTriplets));
 	MPI_Cart_coords(comm, rank, CART_DIM, coord);
 
-	receivedTriplet = shearSort(receivedTriplet, 16, comm);
+	// Perform shear sort
+	receivedTriplet = shearSort(receivedTriplet, numOfTriplets, comm);
 
+	// Gather results from processes
 	MPI_Gather(&receivedTriplet, 1, MPI_TRIPLET, triplets, 1, MPI_TRIPLET, 0, MPI_COMM_WORLD);
+
+	// Master rank prints sorted result and saves to file
 	if (isMaster(rank)) {
 		printf("\n--------------- Sorted: ---------------\n");
-		printShearSortResult(triplets, 16);
-		writeShearSortResultToFile(triplets, OUTPUT);
+		printShearSortResult(triplets, numOfTriplets);
+		writeShearSortResultToFile(triplets, OUTPUT, numOfTriplets);
 	}
 
 	MPI_Finalize();
+
+	// Free triplet array
+	free(triplets);
 
 	return 0;
 }

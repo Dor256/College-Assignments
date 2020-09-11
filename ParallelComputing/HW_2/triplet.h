@@ -2,9 +2,7 @@
 #define TRIPLET_H_
 
 #define TRIPLET_SIZE 3
-#define MAX_TRIPLETS 100
-#define MAT_ROW_SIZE 4
-#define MAT_SIZE (MAT_ROW_SIZE * MAT_ROW_SIZE)
+#define MAX_INPUT_LENGTH 256
 #define CART_DIM 2
 #define AVOID_CILCLIC 0
 
@@ -14,6 +12,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <mpi.h>
+#include <ctype.h>
 
 #include "utils.h"
 
@@ -25,7 +24,9 @@ typedef struct Triplet{
 
 MPI_Datatype MPITypeFromTriplet();
 
-void readTripletsFromFile(char *fileName, Triplet triplets[MAX_TRIPLETS]);
+Triplet* readTripletsFromFile(char *fileName, Triplet *triplets, int *size);
+
+Triplet* readTripletsFromInput(Triplet *triplets, int *size);
 
 void printTriplet(Triplet t);
 
@@ -41,17 +42,17 @@ void writeTripletsToFile(FILE *fptr, Triplet *triplets, int size);
 
 void writeTripletsToFileReversed(FILE *fptr, Triplet *triplets, int size);
 
-void createCart(int *dim, int *period, int reorder, MPI_Comm *comm);
+void createCart(int *dim, int *period, int reorder, MPI_Comm *comm, int numOfDim);
 
 void printShearSortResult(Triplet *triplets, int size);
 
-void writeShearSortResultToFile(Triplet *triplets, char *fileName);
+void writeShearSortResultToFile(Triplet *triplets, char *fileName, int size);
 
 Triplet shearSort(Triplet receivedTriplet, int size, MPI_Comm comm);
 
 Triplet oddEvenTranspositionSort(int *coord, Triplet triplet, enum MatrixPassBy direction, MPI_Comm comm);
 
-Triplet exchangeCuboids(Triplet myCuboid, int commMethod, enum SortDirection driection, int neighbor, MPI_Comm comm);
+Triplet exchangeTriplets(Triplet myCuboid, int commMethod, enum SortDirection driection, int neighbor, MPI_Comm comm);
 
 
 #endif
