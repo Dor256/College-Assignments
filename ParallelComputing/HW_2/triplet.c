@@ -64,8 +64,8 @@ Triplet* readTripletsFromFile(char *fileName, Triplet *triplets, int *size) {
 		// Check for correct input
 		inputResult = sqrt((double) length);
 		if (inputResult * floor(inputResult) != length) {
-			printf("Input is not a perfect square!\n");
-			exit(1);
+			printf("ERROR - Input is not a perfect square!\n");
+			MPI_Abort(MPI_COMM_WORLD, 1);
 		}
 	}
 	return triplets;
@@ -112,8 +112,8 @@ Triplet* readTripletsFromInput(Triplet *triplets, int *size) {
 	// Check for correct input
 	inputResult = sqrt((double) length);
 	if (inputResult * floor(inputResult) != length) {
-		printf("Input is not a perfect square!\n");
-		exit(1);
+		printf("ERROR - Input is not a perfect square!\n");
+		MPI_Abort(MPI_COMM_WORLD, 1);
 	}
 	return triplets;
 }
