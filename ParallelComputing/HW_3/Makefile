@@ -1,9 +1,9 @@
 build:
-	mpicc -fopenmp -c main.c -o main.o
-	mpicc -fopenmp -c helpers.c -o helpers.o
-	mpicc -fopenmp -c ompHistogram.c -o ompHistogram.o
+	mpicxx -fopenmp -c main.c -o main.o
+	mpicxx -fopenmp -c helpers.c -o helpers.o
+	mpicxx -fopenmp -c ompHistogram.c -o ompHistogram.o
 	nvcc -I./includes -c cudaHistogram.cu -o cudaHistogram.o
-	mpicc -fopenmp -o main main.o helpers.o ompHistogram.o cudaHistogram.o /usr/local/cuda-9.1/lib64/libcudart_static.a -ldl -lrt
+	mpicxx -fopenmp -o main main.o helpers.o ompHistogram.o cudaHistogram.o /usr/local/cuda-9.1/lib64/libcudart_static.a -ldl -lrt
 
 clean:
 	rm -f *.o ./main
