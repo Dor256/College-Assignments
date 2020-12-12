@@ -5,26 +5,23 @@
 #include <string.h>
 #include "prototype.h"
 
-struct Result* ompDecrypt(int maxKey, int keyLen, char* inputData, size_t inputLen, char* wordData, size_t wordLen) {
+struct Result* ompDecrypt(int maxKey, int fromKey, int keyLen, char* inputData, size_t inputLen, char* wordData, size_t wordLen) {
 	int numberOfThreads, threadId;
-	struct Result *result;
-	#pragma omp parllel private(threadId) shared(numberOfThreads, maxKey, keyLen, inputData, inputLen, wordData, wordLen)
-	{
-		int i;
-		char *key, *decrypted;
-		#pragma omp single
-		{
-			#pragma omp for
-			for (i = 0; i < maxKey; i++) {
-				key = decimalToBinary(i);
-				decrypted = encryptDecrypt(key, keyLen, inputData, inputLen);
-				if (validate(decrypted, wordData, wordLen)) {
-					printf("The string is %s for key %s\n", decrypted, key);
-					strcpy(result->key, key);
-					strcpy(result->plaintext, inputData);
-					break;
-				}
-			}
+	struct Result *result = (struct Result*) malloc(sizeof(struct Result));
+	result->key = NULL;
+	result->plaintext = NULL;
+	omp_set_num_threads(4);
+	int i;
+	char *key, *decrypted;
+	#pragma omp parallel for
+	for (i = fromKey; i < maxKey; i++) {
+		key = decimalToBinary(i);
+		decrypted = encryptDecrypt(key, keyLen, inputData, inputLen);
+		if (validate(decrypted, wordData, wordLen)) {
+			result->key = (char*) malloc(keyLen * sizeof(char));
+			result->plaintext = (char*) malloc(MAX_TEXT_LENGTH * sizeof(char));
+			strcpy(result->key, key);
+			strcpy(result->plaintext, decrypted);
 		}
 	}
 	return result;

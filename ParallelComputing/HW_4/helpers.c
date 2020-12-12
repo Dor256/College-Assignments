@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 #include "prototype.h"
 
 int readInputLength(FILE *file) {
@@ -57,6 +58,31 @@ int readInputLength(FILE *file) {
 
 // 	return histogram;
 // }
+struct Result* decrypt(int keyLen, char* inputData, size_t inputLen, char* wordData, size_t wordLen) {
+   struct Result *firstRes;
+   struct Result *secondRes;
+
+   int maxKey = pow(keyLen, 2);
+   int halfKey = floor(maxKey / 2);
+   firstRes = ompDecrypt(halfKey, 0, keyLen, inputData, inputLen, wordData, wordLen);
+   secondRes = ompDecrypt(maxKey, halfKey + 1, keyLen, inputData, inputLen, wordData, wordLen);
+
+   if (!firstRes->key) {
+      printf("Result came from second process!\n");
+   }
+   if (!secondRes->key) {
+      printf("Result came from first process!\n");
+   }
+   if (!firstRes->key && !secondRes->key) {
+      printf("Program failed to decrypt!\n");
+      MPI_Abort(MPI_COMM_WORLD, 1);
+   }
+   if (firstRes) {
+      return firstRes;
+   } else {
+      return secondRes;
+   }
+}
 
 char* decimalToBinary(int n) {
    int i = 0;

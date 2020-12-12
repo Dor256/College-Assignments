@@ -41,8 +41,8 @@ int main(int argc, char *argv[]) {
          MPI_Abort(MPI_COMM_WORLD, 1);
       }
 
-      input = readStringFromFile(cipherFile, 512, &inputLength);
-      words = readStringFromFile(wordsFile, 512, &wordLength);
+      input = readStringFromFile(cipherFile, MAX_TEXT_LENGTH, &inputLength);
+      words = readStringFromFile(wordsFile, MAX_TEXT_LENGTH, &wordLength);
       MPI_Send(&keyLength, 1, MPI_INT, 1, 0, MPI_COMM_WORLD);
       MPI_Send(&inputLength, 1, MPI_INT, 1, 0, MPI_COMM_WORLD);
       MPI_Send(&wordLength, 1, MPI_INT, 1, 0, MPI_COMM_WORLD);
@@ -51,7 +51,8 @@ int main(int argc, char *argv[]) {
    } else {
       // Receive half of the array
       char *key, *inputData, *wordData, *decrypted;
-      int inputLen, keyLen, wordLen, maxKey, i;
+      int inputLen, keyLen, wordLen, i;
+      struct Result* res;
       MPI_Recv(&keyLen, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, &status);
       MPI_Recv(&inputLen, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, &status);
       MPI_Recv(&wordLen, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, &status);
@@ -63,8 +64,9 @@ int main(int argc, char *argv[]) {
       }
       MPI_Recv(inputData, inputLen, MPI_CHAR, 0, 0, MPI_COMM_WORLD, &status);
       MPI_Recv(wordData, wordLen, MPI_CHAR, 0, 0, MPI_COMM_WORLD, &status);
-      maxKey = floor(pow(keyLen, 2) / 2);
-      ompDecrypt(maxKey, keyLen, inputData, inputLen, wordData, wordLen);
+      //maxKey = floor(pow(keyLen, 2) / 2);
+      res = decrypt(keyLen, inputData, inputLen, wordData, wordLen);
+      printf("text: %s\nkey: %s\n", res->plaintext, res->key);
       // for (i = 8; i < maxKey * 2; i++) {
       //    key = decimalToBinary(i);
       //    decrypted = encryptDecrypt(key, keyLen, inputData, inputLen);
