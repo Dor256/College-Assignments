@@ -84,6 +84,5 @@ char* encryptDecrypt(char *key, size_t keyLength, char *input, size_t inputLengt
     // fwrite(out, sizeof(char), inputLength, fp);
     // fclose(fp);
 
-    // validate(2, (char**)files);
     return out;
 }

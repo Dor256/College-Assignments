@@ -45,8 +45,8 @@ int main(int argc, char *argv[]) {
       words = readStringFromFile(wordsFile, 512, &wordLength);
       MPI_Send(&keyLength, 1, MPI_INT, 1, 0, MPI_COMM_WORLD);
       MPI_Send(&inputLength, 1, MPI_INT, 1, 0, MPI_COMM_WORLD);
-      MPI_Send(input, inputLength, MPI_CHAR, 1, 0, MPI_COMM_WORLD);
       MPI_Send(&wordLength, 1, MPI_INT, 1, 0, MPI_COMM_WORLD);
+      MPI_Send(input, inputLength, MPI_CHAR, 1, 0, MPI_COMM_WORLD);
       MPI_Send(words, wordLength, MPI_CHAR, 1, 0, MPI_COMM_WORLD);
    } else {
       // Receive half of the array
@@ -64,14 +64,15 @@ int main(int argc, char *argv[]) {
       MPI_Recv(inputData, inputLen, MPI_CHAR, 0, 0, MPI_COMM_WORLD, &status);
       MPI_Recv(wordData, wordLen, MPI_CHAR, 0, 0, MPI_COMM_WORLD, &status);
       maxKey = floor(pow(keyLen, 2) / 2);
-      for (i = 0; i < maxKey; i++) {
-         key = decimalToBinary(i);
-         decrypted = encryptDecrypt(key, keyLen, inputData, inputLen);
-         if (validate(decrypted, wordData, wordLen)) {
-            printf("The string is %s for key %s\n", decrypted, key);
-            break;
-         }
-      }
+      ompDecrypt(maxKey, keyLen, inputData, inputLen, wordData, wordLen);
+      // for (i = 8; i < maxKey * 2; i++) {
+      //    key = decimalToBinary(i);
+      //    decrypted = encryptDecrypt(key, keyLen, inputData, inputLen);
+      //    if (validate(decrypted, wordData, wordLen)) {
+      //       printf("The string is %s for key %s\n", decrypted, key);
+      //       break;
+      //    }
+      // }
    }
    // histograms = calcHistogram(input, size);
 

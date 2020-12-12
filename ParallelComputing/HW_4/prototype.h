@@ -7,11 +7,17 @@
 #define DEFAULT_WORDS_FILE "/usr/share/dict/words"
 #define MAX_KEY_LENGTH 4
 
+struct Result {
+  char* plaintext;
+  char* key;
+};
+
 int readInputLength(FILE *file);
 int* readInput(FILE *file, int size);
 int* calcHistogram(int* arr, int size);
-int* ompHistogramCalc(int* arr, int size);
-int* cudaHistogramCalc(int* arr, int size);
+struct Result* ompDecrypt(int maxKey, int keyLen, char* inputData, size_t inputLen, char* wordData, size_t wordLen);
+
+// int* cudaHistogramCalc(int* arr, int size);
 bool validate(char *input, char *words, size_t wordLength);
 char* encryptDecrypt(char *key, size_t keyLength, char *input, size_t inputLength);
 long getFileContentsAsString(FILE *file, char **contents);
