@@ -6,15 +6,19 @@
 #include "prototype.h"
 
 int main(int argc, char *argv[]) {
-   int size, rank, i;
+   // Variable declaration for master process
+   int size, rank;
    size_t inputLength;
-   size_t wordLength;
    char *input, *words;
-   int *histograms;
-   int *result;
    int keyLength;
    MPI_Status status;
    FILE *cipherFile, *wordsFile;
+
+   // Variable declaration for child process
+   size_t wordLength;
+   char *key, *inputData, *wordData, *decrypted;
+   int inputLen, keyLen, wordLen;
+   struct Result* res;
 
    MPI_Init(&argc, &argv);
    MPI_Comm_size(MPI_COMM_WORLD, &size);
@@ -41,21 +45,27 @@ int main(int argc, char *argv[]) {
          MPI_Abort(MPI_COMM_WORLD, 1);
       }
 
+      // Read input data and known words from relevant files
       input = readStringFromFile(cipherFile, MAX_TEXT_LENGTH, &inputLength);
       words = readStringFromFile(wordsFile, MAX_TEXT_LENGTH, &wordLength);
+
+      // Send the data to processing
       MPI_Send(&keyLength, 1, MPI_INT, 1, 0, MPI_COMM_WORLD);
       MPI_Send(&inputLength, 1, MPI_INT, 1, 0, MPI_COMM_WORLD);
       MPI_Send(&wordLength, 1, MPI_INT, 1, 0, MPI_COMM_WORLD);
       MPI_Send(input, inputLength, MPI_CHAR, 1, 0, MPI_COMM_WORLD);
       MPI_Send(words, wordLength, MPI_CHAR, 1, 0, MPI_COMM_WORLD);
    } else {
-      // Receive half of the array
       char *key, *inputData, *wordData, *decrypted;
-      int inputLen, keyLen, wordLen, i;
+      int inputLen, keyLen, wordLen;
       struct Result* res;
+
+      // Receive data from main process
       MPI_Recv(&keyLen, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, &status);
       MPI_Recv(&inputLen, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, &status);
       MPI_Recv(&wordLen, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, &status);
+
+      // Allocate memory for input data
       inputData = (char*) malloc(sizeof(char) * inputLen);
       wordData = (char*) malloc(sizeof(char) * wordLen);
       if (!inputData || !wordData) {
@@ -64,46 +74,26 @@ int main(int argc, char *argv[]) {
       }
       MPI_Recv(inputData, inputLen, MPI_CHAR, 0, 0, MPI_COMM_WORLD, &status);
       MPI_Recv(wordData, wordLen, MPI_CHAR, 0, 0, MPI_COMM_WORLD, &status);
-      //maxKey = floor(pow(keyLen, 2) / 2);
-      res = decrypt(keyLen, inputData, inputLen, wordData, wordLen);
+
+      // Print the deciphered text and the correct key
       printf("text: %s\nkey: %s\n", res->plaintext, res->key);
-      // for (i = 8; i < maxKey * 2; i++) {
-      //    key = decimalToBinary(i);
-      //    decrypted = encryptDecrypt(key, keyLen, inputData, inputLen);
-      //    if (validate(decrypted, wordData, wordLen)) {
-      //       printf("The string is %s for key %s\n", decrypted, key);
-      //       break;
-      //    }
-      // }
    }
-   // histograms = calcHistogram(input, size);
 
-   // Receive result from process
-   // if (rank == 0) {
-   //    result = (int*) malloc(BUCKET_SIZE * sizeof(int));
+   // Send data to OpenMP processes for brute-force decryption
+   res = decrypt(keyLen, inputData, inputLen, wordData, wordLen);
+   if (res && res->key && res-> plaintext) {
+      printf("\n========Decrypted Text: %s========\n========Encryption Key: %s========\n", res->plaintext, res->key);
+   }
 
-   //    if (!result) {
-   //       fprintf(stderr, "Memory allocation failed\n");
-   //       MPI_Abort(MPI_COMM_WORLD, __LINE__);
-   //    }
-   //    MPI_Recv(result, BUCKET_SIZE, MPI_INT, 1, 0, MPI_COMM_WORLD, &status);
-
-   //    #pragma omp parallel for
-   //    for (i = 0; i < BUCKET_SIZE; ++i) {
-   //       // histograms[i] += result[i];
-   //    }
-   //    for (i = 0; i < BUCKET_SIZE; ++i) {
-   //       // printf("%d ", histograms[i]);
-   //    }
-
-   //    printf("\n");
-   //    free(result);
-   // } else {
-   //    // MPI_Send(histograms, BUCKET_SIZE, MPI_INT, 0, 0, MPI_COMM_WORLD);
-   // }
-
-   // free(histograms);
-   // free(input);
+   // Free allocated memory
+   if (rank == 0) {
+      free(input);
+      free(words);
+   } else {
+      free(inputData);
+      free(wordData);
+      free(res);
+   }
 
    MPI_Finalize();
 

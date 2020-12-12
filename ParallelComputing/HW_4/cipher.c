@@ -76,8 +76,9 @@ void printHelp(char *argv)
 char* encryptDecrypt(char *key, size_t keyLength, char *input, size_t inputLength)
 {
     char *out;
-    binaryStringToBinary(key, keyLength / MAX_KEY_LENGTH);
-    out = cipher(key, keyLength / MAX_KEY_LENGTH, input, inputLength);
+
+    binaryStringToBinary(key, keyLength / MIN_KEY_LENGTH);
+    out = cipher(key, keyLength / MIN_KEY_LENGTH, input, inputLength);
 
     // DEBUG WRITE TO out.txt
     // FILE *fp = fopen("out.txt", "w");
