@@ -6,9 +6,9 @@
 #include <math.h>
 #include "prototype.h"
 
-struct Result* decrypt(int keyLen, char* inputData, size_t inputLen, char* wordData, size_t wordLen) {
-   struct Result *firstRes;
-   struct Result *secondRes;
+Result* decrypt(int keyLen, char* inputData, size_t inputLen, char* wordData, size_t wordLen) {
+   Result *firstRes;
+   Result *secondRes;
 
    // Calculate the max key length
    int maxKey = pow(keyLen, 2);

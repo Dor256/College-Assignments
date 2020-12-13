@@ -8,13 +8,13 @@
 #define MIN_KEY_LENGTH 4
 #define NUM_OF_THREADS 4
 
-struct Result {
+typedef struct {
   char* plaintext;
   char* key;
-};
+} Result;
 
-struct Result* ompDecrypt(int maxKey, int fromKey, int keyLen, char* inputData, size_t inputLen, char* wordData, size_t wordLen);
-struct Result* decrypt(int keyLen, char* inputData, size_t inputLen, char* wordData, size_t wordLen); 
+Result* ompDecrypt(int maxKey, int fromKey, int keyLen, char* inputData, size_t inputLen, char* wordData, size_t wordLen);
+Result* decrypt(int keyLen, char* inputData, size_t inputLen, char* wordData, size_t wordLen); 
 
 bool validate(char *input, char *words, size_t wordLength);
 char* encryptDecrypt(char *key, size_t keyLength, char *input, size_t inputLength);

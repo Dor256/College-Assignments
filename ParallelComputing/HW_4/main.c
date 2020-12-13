@@ -18,7 +18,7 @@ int main(int argc, char *argv[]) {
    size_t wordLength;
    char *key, *inputData, *wordData, *decrypted;
    int inputLen, keyLen, wordLen;
-   struct Result* res;
+   Result* res;
 
    MPI_Init(&argc, &argv);
    MPI_Comm_size(MPI_COMM_WORLD, &size);

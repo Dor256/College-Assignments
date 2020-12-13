@@ -65,14 +65,6 @@ char* cipher(char *key, size_t key_len, char *input, size_t inputLength)
     return output_str;
 }
 
-void printHelp(char *argv)
-{
-    fprintf(stdout, "usage: %s KEY KEY_LENGTH [options]...\nEncrypt a file using xor cipher (key length in bytes)\n", argv);
-    fprintf(stdout, "    -i, --input             specify input file\n");
-    fprintf(stdout, "    -o, --output            specify output file\n");
-    fprintf(stdout, "    -b, --binary            read key as binary\n");
-}
-
 char* encryptDecrypt(char *key, size_t keyLength, char *input, size_t inputLength)
 {
     char *out;

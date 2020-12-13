@@ -5,13 +5,13 @@
 #include <string.h>
 #include "prototype.h"
 
-struct Result* ompDecrypt(int maxKey, int fromKey, int keyLen, char* inputData, size_t inputLen, char* wordData, size_t wordLen) {
+Result* ompDecrypt(int maxKey, int fromKey, int keyLen, char* inputData, size_t inputLen, char* wordData, size_t wordLen) {
 	int threadId;
 	int i;
 	char *key, *decrypted;
 
 	// Allocate memory for result struct
-	struct Result *result = (struct Result*) malloc(sizeof(struct Result));
+	Result *result = (Result*) malloc(sizeof(Result));
 	result->key = NULL;
 	result->plaintext = NULL;
 
