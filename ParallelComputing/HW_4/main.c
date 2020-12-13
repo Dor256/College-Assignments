@@ -56,10 +56,6 @@ int main(int argc, char *argv[]) {
       MPI_Send(input, inputLength, MPI_CHAR, 1, 0, MPI_COMM_WORLD);
       MPI_Send(words, wordLength, MPI_CHAR, 1, 0, MPI_COMM_WORLD);
    } else {
-      char *key, *inputData, *wordData, *decrypted;
-      int inputLen, keyLen, wordLen;
-      struct Result* res;
-
       // Receive data from main process
       MPI_Recv(&keyLen, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, &status);
       MPI_Recv(&inputLen, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, &status);
@@ -74,9 +70,6 @@ int main(int argc, char *argv[]) {
       }
       MPI_Recv(inputData, inputLen, MPI_CHAR, 0, 0, MPI_COMM_WORLD, &status);
       MPI_Recv(wordData, wordLen, MPI_CHAR, 0, 0, MPI_COMM_WORLD, &status);
-
-      // Print the deciphered text and the correct key
-      printf("text: %s\nkey: %s\n", res->plaintext, res->key);
    }
 
    // Send data to OpenMP processes for brute-force decryption

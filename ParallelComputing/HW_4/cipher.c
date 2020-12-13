@@ -80,7 +80,7 @@ char* encryptDecrypt(char *key, size_t keyLength, char *input, size_t inputLengt
     binaryStringToBinary(key, keyLength / MIN_KEY_LENGTH);
     out = cipher(key, keyLength / MIN_KEY_LENGTH, input, inputLength);
 
-    // DEBUG WRITE TO out.txt
+    //DEBUG WRITE TO out.txt
     // FILE *fp = fopen("out.txt", "w");
     // fwrite(out, sizeof(char), inputLength, fp);
     // fclose(fp);

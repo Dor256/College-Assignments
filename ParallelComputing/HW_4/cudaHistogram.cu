@@ -3,99 +3,59 @@
 #include <stdlib.h>
 #include "prototype.h"
 
-__global__  void calculationKernel(int *arr, int part, int *bucket, int numOfBlocks, int threadsPerBlock) {
-	int threadId, blockId, start, end, startOfBucket, i;
+__global__  void decryptKernel(struct Result* result, int maxKey, int fromKey, char* inputData, size_t inputLen, char* wordData, size_t wordLen) {
+	for (i = fromKey; i < maxKey; i++) {
+		// Get threadId
+		threadId = omp_get_thread_num();
+		// Get binary string representation fo key
+		key = decimalToBinary(i);
+		// Try to decrypt the cipher with the current key
+		decrypted = encryptDecrypt(key, keyLen, inputData, inputLen);
+		// Check if the decrypted plaintext makes sense by matching it with the known words text
+		if (validate(decrypted, wordData, wordLen)) {
+			// Print the threadId that managed to decrypt
+			printf("Solving thread is: %d\n", threadId);
+			// Allocate memory for encryption key & plaintext
+			result->key = (char*) malloc(keyLen * sizeof(char));
+			result->plaintext = (char*) malloc(MAX_TEXT_LENGTH * sizeof(char));
 
-	threadId = threadIdx.x;
-	blockId = blockIdx.x;
-
-	start = threadId * part;
-	end = start + part;
-
-	if (threadId < threadsPerBlock) {
-		startOfBucket = (blockId * threadsPerBlock + threadId) * BUCKET_SIZE;
-		for (i = start; i < end; ++i) {
-			bucket[startOfBucket + arr[i]]++;
-		}
-	}
-}
-
-__global__  void mergeKernel(int *histogram, int *bucket, int numOfBlocks, int threadsPerBlock) {
-	int threadId, i, j;
-
-	threadId = threadIdx.x;
-
-	for (i = 0; i < numOfBlocks; i++) {
-		for (j = 0; j < threadsPerBlock; j++) {
-			histogram[threadId] += bucket[(i * threadsPerBlock + j) * BUCKET_SIZE+ threadId];
+			// Save encryption key & plaintext
+			strcpy(result->key, key);
+			strcpy(result->plaintext, decrypted);
 		}
 	}
 }
 
 
-int* cudaHistogramCalc(int *arr, int size) {
+struct Result* cudaDecrypt(int maxKey, int fromKey, int keyLen, char* inputData, size_t inputLen, char* wordData, size_t wordLen) {
 
     // Holds error strings for cuda errors
     cudaError_t err = cudaSuccess;
-
-    int threadsPerBlock, blocksPerGrid, *histogram;
-    size_t length = size * sizeof(int);
-
-    threadsPerBlock = 32;
-    blocksPerGrid = 2;
+    struct Result *result;
+    char *key, *decrypted;
 
     // Allocate memory on GPU for data from the host
-    int *d_A;
-    err = cudaMalloc((void **)&d_A, length);
+    err = cudaMalloc((struct Result**)&result, sizeof(struct Result*));
     if (err != cudaSuccess) {
         fprintf(stderr, "Memory allocation failed: %s\n", cudaGetErrorString(err));
         exit(EXIT_FAILURE);
     }
-
-    // Copy host data to GPU memory
-    err = cudaMemcpy(d_A, arr, length, cudaMemcpyHostToDevice);
+    result->key = NULL;
+    result->plaintext = NULL;
+    
+    decryptKernel<<<1, 5>>>(result, maxKey, fromKey, inputData, inputLen, wordData, wordLen);
+    err = cudaGetLastError();
     if (err != cudaSuccess) {
-        fprintf(stderr, "Failed to copy data from host to device: %s\n", cudaGetErrorString(err));
-        exit(EXIT_FAILURE);
-    }
-
-   // Allocate GPU memory for each bucket
-    int *bucket;
-    err = cudaMalloc((void **)&bucket, threadsPerBlock * blocksPerGrid * BUCKET_SIZE * sizeof(int));
-    if (err != cudaSuccess) {
-        fprintf(stderr, "Memory allocation failed: %s\n", cudaGetErrorString(err));
-        exit(EXIT_FAILURE);
-    }
-
-    // Reset bucket
-    err = cudaMemset(bucket, 0, threadsPerBlock * blocksPerGrid * BUCKET_SIZE * sizeof(int));
-    if (err != cudaSuccess) {
-        fprintf(stderr, "Failed to free allocated memory: %s\n", cudaGetErrorString(err));
-        exit(EXIT_FAILURE);
-    }
-
-   // Allocate GPU memory for each bucket
-    int *temp;
-    err = cudaMalloc((void **)&temp, BUCKET_SIZE * sizeof(int));
-    if (err != cudaSuccess) {
-        fprintf(stderr, "Failed to allocate device memory: %s\n", cudaGetErrorString(err));
-        exit(EXIT_FAILURE);
-    }
-
-    // Reset bucket
-    err = cudaMemset(temp, 0, BUCKET_SIZE * sizeof(int));
-    if (err != cudaSuccess) {
-        fprintf(stderr, "Failed to free allocated memory: %s\n", cudaGetErrorString(err));
-        exit(EXIT_FAILURE);
+        fprintf(stderr, "Call to decryptKernel failed: %s\n", cudaGetErrorString(err));
     }
 
     // Call calculation kernel
-    calculationKernel<<<blocksPerGrid, threadsPerBlock>>>(d_A, size / (threadsPerBlock * blocksPerGrid), bucket, blocksPerGrid, threadsPerBlock);
-    err = cudaGetLastError();
-    if (err != cudaSuccess) {
-        fprintf(stderr, "Call to calculationKernel failed: %s\n", cudaGetErrorString(err));
-        exit(EXIT_FAILURE);
-    }
+    // calculationKernel<<<blocksPerGrid, threadsPerBlock>>>(d_A, size / (threadsPerBlock * blocksPerGrid), bucket, blocksPerGrid, threadsPerBlock);
+    // err = cudaGetLastError();
+    // if (err != cudaSuccess) {
+    //     fprintf(stderr, "Call to calculationKernel failed: %s\n", cudaGetErrorString(err));
+    //     exit(EXIT_FAILURE);
+    // }
 
     err = cudaDeviceSynchronize();
     if (err != cudaSuccess) {
@@ -103,49 +63,55 @@ int* cudaHistogramCalc(int *arr, int size) {
         exit(EXIT_FAILURE);
     }
 
+    if (result && result->key) {
+        printf("%s", result->key);
+    } else {
+        printf("OK");
+    }
+
     // Call merge kernel
-    mergeKernel<<<1, BUCKET_SIZE>>>(temp, bucket, blocksPerGrid, threadsPerBlock);
-    err = cudaGetLastError();
-    if (err != cudaSuccess) {
-        fprintf(stderr, "Call to mergeKernel failed:  %s\n", cudaGetErrorString(err));
-        exit(EXIT_FAILURE);
-    }
+    // mergeKernel<<<1, BUCKET_SIZE>>>(temp, bucket, blocksPerGrid, threadsPerBlock);
+    // err = cudaGetLastError();
+    // if (err != cudaSuccess) {
+    //     fprintf(stderr, "Call to mergeKernel failed:  %s\n", cudaGetErrorString(err));
+    //     exit(EXIT_FAILURE);
+    // }
 
-    err = cudaDeviceSynchronize();
-    if (err != cudaSuccess) {
-        fprintf(stderr, "cudaDeviceSynchronize failed after call to mergKernel -  %s\n", cudaGetErrorString(err));
-        exit(EXIT_FAILURE);
-    }
+    // err = cudaDeviceSynchronize();
+    // if (err != cudaSuccess) {
+    //     fprintf(stderr, "cudaDeviceSynchronize failed after call to mergKernel -  %s\n", cudaGetErrorString(err));
+    //     exit(EXIT_FAILURE);
+    // }
 
-    // Copy result from GPU to the host memory.
-    histogram = (int*) malloc(sizeof(int) * BUCKET_SIZE);
-    if (!histogram) {
-        fprintf(stderr, "Memory allocation failed\n");
-        exit(EXIT_FAILURE);	
-    }
-    err = cudaMemcpy(histogram, temp, sizeof(int) * BUCKET_SIZE, cudaMemcpyDeviceToHost);
-    if (err != cudaSuccess) {
-        fprintf(stderr, "Failed to copy from device to host: %s\n", cudaGetErrorString(err));
-        exit(EXIT_FAILURE);
-    }
-
-    // Free memory on GPU
-    if (cudaFree(d_A) != cudaSuccess) {
-        fprintf(stderr, "Failed to free device memory: %s\n", cudaGetErrorString(err));
-        exit(EXIT_FAILURE);
-    }
+    // // Copy result from GPU to the host memory.
+    // histogram = (int*) malloc(sizeof(int) * BUCKET_SIZE);
+    // if (!histogram) {
+    //     fprintf(stderr, "Memory allocation failed\n");
+    //     exit(EXIT_FAILURE);	
+    // }
+    // err = cudaMemcpy(histogram, temp, sizeof(int) * BUCKET_SIZE, cudaMemcpyDeviceToHost);
+    // if (err != cudaSuccess) {
+    //     fprintf(stderr, "Failed to copy from device to host: %s\n", cudaGetErrorString(err));
+    //     exit(EXIT_FAILURE);
+    // }
 
     // Free memory on GPU
-    if (cudaFree(bucket) != cudaSuccess) {
-        fprintf(stderr, "Failed to free device memory: %s\n", cudaGetErrorString(err));
-        exit(EXIT_FAILURE);
-    }
-    // Free memory on GPU
-    if (cudaFree(temp) != cudaSuccess) {
-        fprintf(stderr, "Failed to free device memory: %s\n", cudaGetErrorString(err));
-        exit(EXIT_FAILURE);
-    }
+    // if (cudaFree(d_A) != cudaSuccess) {
+    //     fprintf(stderr, "Failed to free device memory: %s\n", cudaGetErrorString(err));
+    //     exit(EXIT_FAILURE);
+    // }
 
-    return histogram;
+    // // Free memory on GPU
+    // if (cudaFree(bucket) != cudaSuccess) {
+    //     fprintf(stderr, "Failed to free device memory: %s\n", cudaGetErrorString(err));
+    //     exit(EXIT_FAILURE);
+    // }
+    // // Free memory on GPU
+    // if (cudaFree(temp) != cudaSuccess) {
+    //     fprintf(stderr, "Failed to free device memory: %s\n", cudaGetErrorString(err));
+    //     exit(EXIT_FAILURE);
+    // }
+
+    // return histogram;
 }
 

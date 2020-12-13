@@ -4,9 +4,9 @@ build:
 	mpicxx -fopenmp -c ompDecrypt.c -o ompDecrypt.o
 	mpicxx -fopenmp -c main.c -o main.o
 	mpicxx -fopenmp -c helpers.c -o helpers.o
-	# nvcc -I./includes -c cudaHistogram.cu -o cudaHistogram.o
-	mpicxx -fopenmp -o main main.o cipher.o validator.o helpers.o ompDecrypt.o
-	# mpicxx -fopenmp -o main main.o cipher.o validator.o helpers.o ompHistogram.o cudaHistogram.o /usr/local/cuda-9.1/lib64/libcudart_static.a -ldl -lrt
+	nvcc -I./includes -c cudaHistogram.cu -o cudaHistogram.o
+	# mpicxx -fopenmp -o main main.o cipher.o validator.o helpers.o ompDecrypt.o
+	mpicxx -fopenmp -o main main.o cipher.o validator.o helpers.o ompDecrypt.o cudaHistogram.o /usr/local/cuda-9.1/lib64/libcudart_static.a -ldl -lrt
 
 clean:
 	rm -f *.o ./main
