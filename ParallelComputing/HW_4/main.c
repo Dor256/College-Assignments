@@ -38,6 +38,8 @@ int main(int argc, char *argv[]) {
       cipherFile = fopen(argv[2], "r");
       if (argc == 4) {
          wordsFile = fopen(argv[3], "r");
+      } else {
+         wordsFile = fopen(DEFAULT_WORDS_FILE, "r");
       }
 
       if (!cipherFile) {

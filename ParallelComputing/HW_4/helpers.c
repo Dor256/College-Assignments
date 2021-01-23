@@ -34,10 +34,13 @@ Result* decrypt(int keyLen, char* inputData, size_t inputLen, char* wordData, si
 }
 
 // Return a binary string representation of a decimal number
-char* decimalToBinary(int n) {
+char* decimalToBinary(int n, int keyLen) {
    int i = 0;
-   char *binary = (char*) malloc(sizeof(char) * MIN_KEY_LENGTH);
-   binary = strdup("0000");
+   int j;
+   char *binary = (char*) malloc(sizeof(char) * keyLen);
+   for (j = 0; j < keyLen; j++) {
+      binary[j] = '0';
+   }
    if (n == 0) {
       return binary;
    }

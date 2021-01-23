@@ -5,7 +5,6 @@
 #include "prototype.h"
 #define START_SIZE 512
 #define EXTEND_SIZE 32
-#define MAX_KEY_SIZE 4
 
 char *readStringFromFile(FILE *fp, size_t allocated_size, size_t *input_length)
 {
@@ -13,19 +12,21 @@ char *readStringFromFile(FILE *fp, size_t allocated_size, size_t *input_length)
     int ch;
     *input_length = 0;
     string = (char*)realloc(NULL, sizeof(char) * allocated_size);
-    if (!string)
+    if (!string) {
         return string;
+    }
     while (EOF != (ch = fgetc(fp)))
     {
-        if (ch == EOF)
+        if (ch == EOF) {
             break;
+        }
         string[*input_length] = ch;
         *input_length += 1;
-        if (*input_length == allocated_size)
-        {
+        if (*input_length == allocated_size) {
             string = (char*)realloc(string, sizeof(char) * (allocated_size += EXTEND_SIZE));
-            if (!string)
+            if (!string) {
                 return string;
+            }
         }
     }
     return (char*)realloc(string, sizeof(char) * (*input_length));
@@ -33,18 +34,18 @@ char *readStringFromFile(FILE *fp, size_t allocated_size, size_t *input_length)
 
 void binaryStringToBinary(char *string, size_t num_bytes)
 {
-    int i,byte;
-    unsigned char binary_key[MAX_KEY_SIZE];
-    for(byte = 0;byte<num_bytes;byte++)
+    int i, byte;
+    unsigned char binary_key[num_bytes];
+    for(byte = 0; byte < num_bytes; byte++)
     {
         binary_key[byte] = 0;
-        for(i=0;i<8;i++)
+        for(i = 0; i < 8; i++)
         {
             binary_key[byte] = binary_key[byte] << 1;
-            binary_key[byte] |= string[byte*8 + i] == '1' ? 1 : 0;  
+            binary_key[byte] |= string[byte * 8 + i] == '1' ? 1 : 0;  
         }
     }
-    memcpy(string,binary_key,num_bytes);
+    memcpy(string, binary_key, num_bytes);
 }
 
 char* cipher(char *key, size_t key_len, char *input, size_t inputLength)
@@ -58,8 +59,9 @@ char* cipher(char *key, size_t key_len, char *input, size_t inputLength)
     }
     for (i = 0; i < inputLength; i++, j++)
     {
-        if (j == key_len)
+        if (j == key_len) {
             j = 0;
+        }
         output_str[i] = input[i] ^ key[j];
     }
     return output_str;

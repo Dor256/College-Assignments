@@ -16,7 +16,7 @@ typedef struct {
 Result* ompDecrypt(int maxKey, int fromKey, int keyLen, char* inputData, size_t inputLen, char* wordData, size_t wordLen);
 Result* decrypt(int keyLen, char* inputData, size_t inputLen, char* wordData, size_t wordLen); 
 
-bool validate(char *input, char *words, size_t wordLength);
+bool validate(char *input, char *words);
 char* encryptDecrypt(char *key, size_t keyLength, char *input, size_t inputLength);
 char *readStringFromFile(FILE *fp, size_t allocated_size, size_t *input_length);
-char* decimalToBinary(int n);
+char* decimalToBinary(int n, int keyLen);

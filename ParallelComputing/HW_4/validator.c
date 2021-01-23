@@ -6,13 +6,15 @@
 #include "prototype.h"
 
 // For a given plaintext and known words return true if the text makes sense
-bool isValid(char *string, char *words, long size) {
+bool isValid(char *string, char *words) {
   int i;
   const char s[2] = "\n";
   char *token;
-  token = strtok(words, s);
+  char tmp[MAX_TEXT_LENGTH];
+  strcpy(tmp, string);
+  token = strtok(tmp, s);
   while (token != NULL) {
-    if (strstr(string, token) != NULL) {
+    if (strstr(words, token) != NULL) {
       return true;
     }
     token = strtok(NULL, s);
@@ -21,6 +23,6 @@ bool isValid(char *string, char *words, long size) {
 }
 
 // Function to validate the deciphered text
-bool validate(char *input, char *words, size_t wordLength) {
- return isValid(input, words, wordLength);
+bool validate(char *input, char *words) {
+ return isValid(input, words);
 }

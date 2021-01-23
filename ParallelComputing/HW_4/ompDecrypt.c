@@ -24,11 +24,11 @@ Result* ompDecrypt(int maxKey, int fromKey, int keyLen, char* inputData, size_t 
 		// Get threadId
 		threadId = omp_get_thread_num();
 		// Get binary string representation fo key
-		key = decimalToBinary(i);
+		key = decimalToBinary(i, keyLen);
 		// Try to decrypt the cipher with the current key
 		decrypted = encryptDecrypt(key, keyLen, inputData, inputLen);
 		// Check if the decrypted plaintext makes sense by matching it with the known words text
-		if (validate(decrypted, wordData, wordLen)) {
+		if (validate(decrypted, wordData)) {
 			// Print the threadId that managed to decrypt
 			printf("Solving thread is: %d\n", threadId);
 			// Allocate memory for encryption key & plaintext
