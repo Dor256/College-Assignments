@@ -8,10 +8,9 @@
 // For a given plaintext and known words return true if the text makes sense
 bool isValid(char *string, char *words) {
   int i;
-  const char s[2] = "\n";
+  const char s[3] = " \n";
   char *token;
-  char tmp[MAX_TEXT_LENGTH];
-  strcpy(tmp, string);
+  char *tmp = strdup(string);
   token = strtok(tmp, s);
   while (token != NULL) {
     if (strstr(words, token) != NULL) {

@@ -6,7 +6,7 @@
 #define START_SIZE 512
 #define EXTEND_SIZE 32
 
-char *readStringFromFile(FILE *fp, size_t allocated_size, size_t *input_length)
+char* readStringFromFile(FILE *fp, size_t allocated_size, size_t *input_length)
 {
     char *string;
     int ch;
