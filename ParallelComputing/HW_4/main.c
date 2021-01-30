@@ -3,25 +3,22 @@
 #include <omp.h>
 #include <stdlib.h>
 #include <math.h>
+#include <glib.h>
 #include "prototype.h"
 
 int main(int argc, char *argv[]) {
-   // Variable declaration for master process
    int size, rank;
-   size_t inputLength;
-   char *input, *words;
-   int keyLength;
    MPI_Status status;
    FILE *cipherFile, *wordsFile;
 
-   // Variable declaration for child process
-   size_t wordLength;
-   char *key, *inputData, *wordData, *decrypted;
-   int inputLen, keyLen, wordLen;
-   Result* res;
-
    MPI_Init(&argc, &argv);
    MPI_Comm_size(MPI_COMM_WORLD, &size);
+   int inputLength, wordLength;
+   int fromKey, toKey, maxKey, keyLength;
+   char *words, *input;
+   Result *res;
+   GHashTable *wordSet;
+
    if (size != 2) {
       printf("Only two processes allowed!\n");
       MPI_Abort(MPI_COMM_WORLD, __LINE__);
@@ -52,43 +49,46 @@ int main(int argc, char *argv[]) {
       words = readStringFromFile(wordsFile, MAX_TEXT_LENGTH, &wordLength);
 
       // Send the data to processing
+      fromKey = 0;
+      maxKey = pow(keyLength, 2);
+      toKey = floor(maxKey / 2);
       MPI_Send(&keyLength, 1, MPI_INT, 1, 0, MPI_COMM_WORLD);
+      MPI_Send(&maxKey, 1, MPI_INT, 1, 0, MPI_COMM_WORLD);
       MPI_Send(&inputLength, 1, MPI_INT, 1, 0, MPI_COMM_WORLD);
       MPI_Send(&wordLength, 1, MPI_INT, 1, 0, MPI_COMM_WORLD);
       MPI_Send(input, inputLength, MPI_CHAR, 1, 0, MPI_COMM_WORLD);
       MPI_Send(words, wordLength, MPI_CHAR, 1, 0, MPI_COMM_WORLD);
    } else {
       // Receive data from main process
-      MPI_Recv(&keyLen, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, &status);
-      MPI_Recv(&inputLen, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, &status);
-      MPI_Recv(&wordLen, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, &status);
+      MPI_Recv(&keyLength, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, &status);
+      MPI_Recv(&maxKey, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, &status);
+      MPI_Recv(&inputLength, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, &status);
+      MPI_Recv(&wordLength, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, &status);
 
       // Allocate memory for input data
-      inputData = (char*) malloc(sizeof(char) * inputLen);
-      wordData = (char*) malloc(sizeof(char) * wordLen);
-      if (!inputData || !wordData) {
+      input = (char*) malloc(sizeof(char) * inputLength);
+      words = (char*) malloc(sizeof(char) * wordLength);
+      if (!input || !words) {
          fprintf(stderr, "Memory allocation failed\n");
          MPI_Abort(MPI_COMM_WORLD, __LINE__);
       }
-      MPI_Recv(inputData, inputLen, MPI_CHAR, 0, 0, MPI_COMM_WORLD, &status);
-      MPI_Recv(wordData, wordLen, MPI_CHAR, 0, 0, MPI_COMM_WORLD, &status);
+      MPI_Recv(input, inputLength, MPI_CHAR, 0, 0, MPI_COMM_WORLD, &status);
+      MPI_Recv(words, wordLength, MPI_CHAR, 0, 0, MPI_COMM_WORLD, &status);
+      fromKey = floor(maxKey / 2) + 1;
+      toKey = maxKey;
    }
-
+   // Generate the hash set for the words file
+   wordSet = generateWordSet(words);
    // Send data to OpenMP processes for brute-force decryption
-   res = decrypt(keyLen, inputData, inputLen, wordData, wordLen);
-   if (res && res->key && res-> plaintext) {
+   res = decrypt(keyLength, fromKey, toKey, input, inputLength, wordSet);
+   if (res && res->key && res->plaintext) {
       printf("\n========Decrypted Text: %s========\n========Encryption Key: %s========\n", res->plaintext, res->key);
    }
 
-   // Free allocated memory
-   if (rank == 0) {
-      free(input);
-      free(words);
-   } else {
-      free(inputData);
-      free(wordData);
-      free(res);
-   }
+   free(words);
+   free(input);
+   free(res);
+   g_hash_table_destroy(wordSet);
 
    MPI_Finalize();
 

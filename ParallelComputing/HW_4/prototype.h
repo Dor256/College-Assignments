@@ -2,6 +2,8 @@
 
 #include <stdio.h>
 #include <stdbool.h>
+#include <mpi.h>
+#include <glib.h>
 
 #define MAX_TEXT_LENGTH 512
 #define DEFAULT_WORDS_FILE "/usr/share/dict/words"
@@ -13,10 +15,11 @@ typedef struct {
   char* key;
 } Result;
 
-Result* ompDecrypt(int maxKey, int fromKey, int keyLen, char* inputData, size_t inputLen, char* wordData, size_t wordLen);
-Result* decrypt(int keyLen, char* inputData, size_t inputLen, char* wordData, size_t wordLen); 
+Result* ompDecrypt(int maxKey, int fromKey, int keyLen, char* inputData, size_t inputLen, GHashTable* wordSet);
+Result* decrypt(int keyLen, int fromKey, int toKey, char* inputData, size_t inputLen, GHashTable* wordSet); 
 
-bool validate(char *input, char *words);
+bool validate(char *input, GHashTable *table);
 char* encryptDecrypt(char *key, size_t keyLength, char *input, size_t inputLength);
-char *readStringFromFile(FILE *fp, size_t allocated_size, size_t *input_length);
+char *readStringFromFile(FILE *fp, size_t allocated_size, int *input_length);
 char* decimalToBinary(int n, int keyLen);
+GHashTable *generateWordSet(char* words);

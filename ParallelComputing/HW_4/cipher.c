@@ -6,7 +6,7 @@
 #define START_SIZE 512
 #define EXTEND_SIZE 32
 
-char* readStringFromFile(FILE *fp, size_t allocated_size, size_t *input_length)
+char* readStringFromFile(FILE *fp, size_t allocated_size, int *input_length)
 {
     char *string;
     int ch;
@@ -74,8 +74,8 @@ char* encryptDecrypt(char *key, size_t keyLength, char *input, size_t inputLengt
     binaryStringToBinary(key, keyLength / MIN_KEY_LENGTH);
     out = cipher(key, keyLength / MIN_KEY_LENGTH, input, inputLength);
 
-    //DEBUG WRITE TO out.txt
-    // FILE *fp = fopen("out.txt", "w");
+    // DEBUG WRITE TO out.txt
+    // FILE *fp = fopen("lahout.txt", "w");
     // fwrite(out, sizeof(char), inputLength, fp);
     // fclose(fp);
 

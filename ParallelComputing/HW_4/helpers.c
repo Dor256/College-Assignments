@@ -4,31 +4,22 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <glib.h>
 #include "prototype.h"
 
-Result* decrypt(int keyLen, char* inputData, size_t inputLen, char* wordData, size_t wordLen) {
-   Result *firstRes;
-   Result *secondRes;
-
-   // Calculate the max key length
-   int maxKey = pow(keyLen, 2);
-   // Calculate the mid key length
-   int halfKey = floor(maxKey / 2);
-
+Result* decrypt(int keyLen, int fromKey, int toKey, char* inputData, size_t inputLen, GHashTable* wordSet) {
+   Result *result;
    // Delegate omp tasks to calculate half of all possible encryption keys each
-   firstRes = ompDecrypt(halfKey, 0, keyLen, inputData, inputLen, wordData, wordLen);
-   secondRes = ompDecrypt(maxKey, halfKey + 1, keyLen, inputData, inputLen, wordData, wordLen);
+   result = ompDecrypt(toKey, fromKey, keyLen, inputData, inputLen, wordSet);
 
    // Return null if decryption was unsuccessful
-   if (!firstRes->key && !secondRes->key) {
+   if (!result->key) {
       return NULL;
    }
 
    // If one of the tasks succeeds return the result;
-   if (firstRes) {
-      return firstRes;
-   } else {
-      return secondRes;
+   if (result) {
+      return result;
    }
    return NULL;
 }
@@ -50,4 +41,16 @@ char* decimalToBinary(int n, int keyLen) {
       i++;
    }
    return binary;
+}
+
+GHashTable *generateWordSet(char *words) {
+   GHashTable *table = g_hash_table_new(g_int_hash, g_int_equal);
+   const char separator[2] = "\n";
+   char *token;
+   token = strtok(words, separator);
+   while (token != NULL) {
+      g_hash_table_add(table, token);
+      token = strtok(NULL, separator);
+   }
+   return table;
 }
