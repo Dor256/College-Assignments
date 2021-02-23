@@ -81,8 +81,31 @@ int main(int argc, char *argv[]) {
    wordSet = generateWordSet(words);
    // Send data to OpenMP processes for brute-force decryption
    res = decrypt(keyLength, fromKey, toKey, input, inputLength, wordSet);
-   if (res && res->key && res->plaintext) {
-      printf("\n========Decrypted Text: %s========\n========Encryption Key: %s========\n", res->plaintext, res->key);
+   if (rank != 0) {
+      MPI_Send(res->plaintext, MAX_TEXT_LENGTH, MPI_CHAR, 0, 0, MPI_COMM_WORLD);
+      MPI_Send(res->key, MAX_TEXT_LENGTH, MPI_CHAR, 0, 0, MPI_COMM_WORLD);
+      MPI_Send(&res->matchCount, 1, MPI_INT, 0, 0, MPI_COMM_WORLD);
+   } else {
+      Result *otherResult = (Result*) malloc(sizeof(Result));
+      char *key = (char*) malloc(MAX_TEXT_LENGTH);
+      char *plaintext = (char*) malloc(MAX_TEXT_LENGTH);
+      int matchCount;
+      MPI_Recv(plaintext, MAX_TEXT_LENGTH, MPI_CHAR, 1, 0, MPI_COMM_WORLD, &status);
+      MPI_Recv(key, MAX_TEXT_LENGTH, MPI_CHAR, 1, 0, MPI_COMM_WORLD, &status);
+      MPI_Recv(&matchCount, 1, MPI_INT, 1, 0, MPI_COMM_WORLD, &status);
+      otherResult->plaintext = plaintext;
+      otherResult->key = key;
+      otherResult->matchCount = matchCount;
+
+      if (res->matchCount > otherResult->matchCount) {
+         printf("\n========Decrypted Text: %s========\n========Encryption Key: %s========\n", res->plaintext, res->key);
+      } else {
+          printf("\n========Decrypted Text: %s========\n========Encryption Key: %s========\n", otherResult->plaintext, otherResult->key);
+      }
+
+      free(key);
+      free(plaintext);
+      free(otherResult);
    }
 
    free(words);

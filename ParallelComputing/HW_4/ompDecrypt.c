@@ -7,7 +7,8 @@
 #include "prototype.h"
 
 Result* ompDecrypt(int maxKey, int fromKey, int keyLen, char* inputData, size_t inputLen, GHashTable *wordSet) {
-	int threadId;
+	int bestCount = -1;
+	int matchCount;
 	int i;
 	char *key, *decrypted;
 
@@ -27,7 +28,8 @@ Result* ompDecrypt(int maxKey, int fromKey, int keyLen, char* inputData, size_t 
 		// Try to decrypt the cipher with the current key
 		decrypted = encryptDecrypt(key, keyLen, inputData, inputLen);
 		// Check if the decrypted plaintext makes sense by matching it with the known words text
-		if (validate(decrypted, wordSet)) {
+		matchCount = validate(decrypted, wordSet);
+		if (matchCount > bestCount) {
 			// Allocate memory for encryption key & plaintext
 			result->key = (char*) malloc(keyLen * sizeof(char));
 			result->plaintext = (char*) malloc(MAX_TEXT_LENGTH * sizeof(char));
@@ -35,6 +37,8 @@ Result* ompDecrypt(int maxKey, int fromKey, int keyLen, char* inputData, size_t 
 			// Save encryption key & plaintext
 			strcpy(result->key, key);
 			strcpy(result->plaintext, decrypted);
+			result->matchCount = matchCount;
+			bestCount = matchCount;
 		}
 	}
 	return result;

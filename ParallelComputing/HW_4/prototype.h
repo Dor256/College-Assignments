@@ -1,7 +1,6 @@
 #pragma once
 
 #include <stdio.h>
-#include <stdbool.h>
 #include <mpi.h>
 #include <glib.h>
 
@@ -13,12 +12,13 @@
 typedef struct {
   char* plaintext;
   char* key;
+  int matchCount;
 } Result;
 
 Result* ompDecrypt(int maxKey, int fromKey, int keyLen, char* inputData, size_t inputLen, GHashTable* wordSet);
 Result* decrypt(int keyLen, int fromKey, int toKey, char* inputData, size_t inputLen, GHashTable* wordSet); 
 
-bool validate(char *input, GHashTable *table);
+int validate(char *input, GHashTable *table);
 char* encryptDecrypt(char *key, size_t keyLength, char *input, size_t inputLength);
 char *readStringFromFile(FILE *fp, size_t allocated_size, int *input_length);
 char* decimalToBinary(int n, int keyLen);
