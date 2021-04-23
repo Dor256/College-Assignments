@@ -28,10 +28,7 @@ Result* decrypt(int keyLen, int fromKey, int toKey, char* inputData, size_t inpu
 char* decimalToBinary(int n, int keyLen) {
    int i = 0;
    int j;
-   char *binary = (char*) malloc(sizeof(char) * keyLen);
-   for (j = 0; j < keyLen; j++) {
-      binary[j] = '0';
-   }
+   char *binary = strdup("0000");
    if (n == 0) {
       return binary;
    }

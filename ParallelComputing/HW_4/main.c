@@ -100,7 +100,7 @@ int main(int argc, char *argv[]) {
       if (res->matchCount > otherResult->matchCount) {
          printf("\n========Decrypted Text: %s========\n========Encryption Key: %s========\n", res->plaintext, res->key);
       } else {
-          printf("\n========Decrypted Text: %s========\n========Encryption Key: %s========\n", otherResult->plaintext, otherResult->key);
+         printf("\n========Decrypted Text: %s========\n========Encryption Key: %s========\n", otherResult->plaintext, otherResult->key);
       }
 
       free(key);
